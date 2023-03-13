@@ -4,11 +4,10 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class SportsbookApplicationBackendApplication {
+public class SportsBookBackendApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(SportsbookApplicationBackendApplication.class, args);
-        //
+        SpringApplication.run(SportsBookBackendApplication.class, args);
     }
 
 }
