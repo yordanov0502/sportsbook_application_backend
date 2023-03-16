@@ -1,6 +1,5 @@
 package com.example.sportsbook_application_backend.controller;
 
-import com.example.sportsbook_application_backend.model.dto.LoginDTO;
 import com.example.sportsbook_application_backend.model.dto.UserDTO;
 import com.example.sportsbook_application_backend.service.UserService;
 import org.springframework.web.bind.annotation.PostMapping;
