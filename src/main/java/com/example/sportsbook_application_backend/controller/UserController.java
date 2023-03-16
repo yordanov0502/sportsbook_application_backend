@@ -21,9 +21,9 @@ public class UserController {
     @PostMapping("/registration")
     public StatusResponse registration(@RequestBody RegistrationDTO userDTO){
         if(userService.createUser(userDTO))
-            return new StatusResponse("201 Created","User created successful!","/registration");
+            return new StatusResponse(201,"User created successful!","/registration");
         else
-            return new StatusResponse("400 Bad request","User with such credentials exists!","/registration");
+            return new StatusResponse(400,"User with such credentials exists!","/registration");
     }
 
     @PostMapping("/login")
@@ -31,6 +31,6 @@ public class UserController {
         if(userService.checkUserCredentials(loginDTO))
             return new UserResponse(userService.returnUser(loginDTO));
         else
-            return new StatusResponse("400 Bad request","Wrong credentials!","/login");
+            return new StatusResponse(400,"Wrong credentials!","/login");
     }
 }
