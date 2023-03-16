@@ -1,6 +1,7 @@
 package com.example.sportsbook_application_backend.service;
 
 import com.example.sportsbook_application_backend.model.dto.LoginDTO;
+import com.example.sportsbook_application_backend.model.dto.RegistrationDTO;
 import com.example.sportsbook_application_backend.model.dto.UserDTO;
 import com.example.sportsbook_application_backend.model.entity.User;
 import com.example.sportsbook_application_backend.repository.UserRepository;
@@ -19,7 +20,7 @@ public class UserService {
     }
 
 
-    public boolean createUser(UserDTO userDTO){
+    public boolean createUser(RegistrationDTO userDTO){
         if(!userRepository.existsUserByUsername(userDTO.getUsername()) && !userRepository.existsUserByEmail(userDTO.getEmail())){
             String password=userDTO.getPassword();
             User user=new User();
@@ -38,7 +39,7 @@ public class UserService {
         }
     }
 
-    public boolean login(LoginDTO loginDTO){
+    public boolean checkUserCredentials(LoginDTO loginDTO){
         if(userRepository.existsUserByUsername(loginDTO.getUsername())) {
             User user = userRepository.findUserByUsername(loginDTO.getUsername());
             return passwordEncoder.matches(loginDTO.getPassword(), user.getHash());
@@ -46,6 +47,11 @@ public class UserService {
         else {
             return false;
         }
+    }
+
+    public UserDTO returnUser(LoginDTO loginDTO){
+        User user = userRepository.findUserByUsername(loginDTO.getUsername());
+        return new UserDTO(user.getFirstName(), user.getLastName(), user.getEmail(), user.getUsername());
     }
 
 }
