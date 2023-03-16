@@ -8,4 +8,6 @@ public interface UserRepository extends CrudRepository<User, Long> {
     boolean existsUserByEmail(String email);
     boolean existsUserByUsernameAndHash(String username,String hashedPassword);
     void deleteUserByUsernameAndHash(String username,String hashedPassword);
+    User findUserByUsername(String username);
+
 }

@@ -1,6 +1,10 @@
 package com.example.sportsbook_application_backend.controller;
 
-import com.example.sportsbook_application_backend.model.dto.UserDTO;
+import com.example.sportsbook_application_backend.model.response.Response;
+import com.example.sportsbook_application_backend.model.response.StatusResponse;
+import com.example.sportsbook_application_backend.model.response.UserResponse;
+import com.example.sportsbook_application_backend.model.dto.LoginDTO;
+import com.example.sportsbook_application_backend.model.dto.RegistrationDTO;
 import com.example.sportsbook_application_backend.service.UserService;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -15,10 +19,18 @@ public class UserController {
     }
 
     @PostMapping("/registration")
-    public String registration(@RequestBody UserDTO userDTO){
+    public StatusResponse registration(@RequestBody RegistrationDTO userDTO){
         if(userService.createUser(userDTO))
-            return "User created successful!";
+            return new StatusResponse(201,"User created successful!","/registration");
         else
-            return "User with such credentials exists!";
+            return new StatusResponse(400,"User with such credentials exists!","/registration");
+    }
+
+    @PostMapping("/login")
+    public Response getUser(@RequestBody LoginDTO loginDTO){
+        if(userService.checkUserCredentials(loginDTO))
+            return new UserResponse(userService.returnUser(loginDTO));
+        else
+            return new StatusResponse(400,"Wrong credentials!","/login");
     }
 }
