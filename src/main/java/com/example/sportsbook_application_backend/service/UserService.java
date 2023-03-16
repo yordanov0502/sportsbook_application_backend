@@ -39,8 +39,13 @@ public class UserService {
     }
 
     public boolean login(LoginDTO loginDTO){
-        User user = userRepository.findUserByUsername(loginDTO.getUsername());
-        return passwordEncoder.matches(loginDTO.getPassword(), user.getHash());
+        if(userRepository.existsUserByUsername(loginDTO.getUsername())) {
+            User user = userRepository.findUserByUsername(loginDTO.getUsername());
+            return passwordEncoder.matches(loginDTO.getPassword(), user.getHash());
+        }
+        else {
+            return false;
+        }
     }
 
 }
