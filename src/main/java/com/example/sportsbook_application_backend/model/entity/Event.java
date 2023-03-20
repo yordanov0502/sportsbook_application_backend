@@ -1,11 +1,10 @@
 package com.example.sportsbook_application_backend.model.entity;
 
-import com.example.sportsbook_application_backend.model.enums.Type;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import com.example.sportsbook_application_backend.model.enums.Result;
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
@@ -14,6 +13,8 @@ import java.time.LocalDateTime;
 @Table(name="Events")
 @Getter
 @Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class Event {
     @Id
     @Column(name = "id_event", nullable = false)
@@ -26,7 +27,8 @@ public class Event {
     private String awayTeam;
     @Column(name = "finished", nullable = false)
     private String status;
-    @Column(name = "type")
-    private Type type;
+    @Column(name = "result")
+    @Enumerated(EnumType.STRING)
+    private Result result;
 
 }

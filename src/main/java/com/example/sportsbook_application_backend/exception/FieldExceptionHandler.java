@@ -1,7 +1,6 @@
 package com.example.sportsbook_application_backend.exception;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ProblemDetail;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -25,13 +24,18 @@ public class FieldExceptionHandler {
     }
 
     @ExceptionHandler
-    public ProblemDetail handleException(DatabaseException databaseException){
-        return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, databaseException.getMessage());
+    public ProblemDetail handleException(UpdateException updateException){
+        return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, updateException.getMessage());
     }
 
     @ExceptionHandler
-    public ProblemDetail handleException(AuthenticationException authenticationException){
-        return ProblemDetail.forStatusAndDetail(HttpStatus.UNAUTHORIZED, authenticationException.getMessage());
+    public ProblemDetail handleException(WrongCredentialsException wrongCredentialsException){
+        return ProblemDetail.forStatusAndDetail(HttpStatus.UNAUTHORIZED, wrongCredentialsException.getMessage());
+    }
+
+    @ExceptionHandler
+    public ProblemDetail handleException(DuplicatePasswordException duplicatePasswordException){
+        return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, duplicatePasswordException.getMessage());
     }
 
 }
