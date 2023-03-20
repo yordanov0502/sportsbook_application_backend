@@ -9,11 +9,8 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @Builder
-public class UserDTO {
+public class UserChangePasswordDTO {
     private Long id;
-    private String firstName;
-    private String lastName;
-    private String email;
-    private String username;
-    private Float balance;
+    private String oldPassword;
+    private String newPassword;
 }
