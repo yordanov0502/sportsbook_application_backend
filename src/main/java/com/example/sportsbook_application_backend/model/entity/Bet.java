@@ -2,7 +2,9 @@ package com.example.sportsbook_application_backend.model.entity;
 
 import com.example.sportsbook_application_backend.model.enums.Type;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
@@ -10,6 +12,8 @@ import org.hibernate.annotations.OnDeleteAction;
 @Entity
 @Getter
 @Setter
+@AllArgsConstructor
+@NoArgsConstructor
 @Table(name = "Bets")
 public class Bet {
     @Id
