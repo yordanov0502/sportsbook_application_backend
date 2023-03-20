@@ -10,5 +10,5 @@ public interface UserRepository extends JpaRepository<User, Long> {
     boolean existsUserByUsernameAndHash(String username,String hashedPassword);
     void deleteUserByUsernameAndHash(String username,String hashedPassword);
     User findUserByUsername(String username);
-
+    User findUserByUserId(Long id);
 }
