@@ -1,6 +1,6 @@
 package com.example.sportsbook_application_backend.model.entity;
 
-import com.example.sportsbook_application_backend.model.enums.Result;
+import com.example.sportsbook_application_backend.model.enums.Type;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -26,7 +26,7 @@ public class Event {
     private String awayTeam;
     @Column(name = "finished", nullable = false)
     private String status;
-    @Column(name = "result")
-    private Result result;
+    @Column(name = "type")
+    private Type type;
 
 }
