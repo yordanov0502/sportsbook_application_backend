@@ -1,4 +1,4 @@
-package com.example.sportsbook_application_backend.model.json.odd;
+package com.example.sportsbook_application_backend.model.dto.odd;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
@@ -7,15 +7,11 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.ArrayList;
-import java.util.List;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class Odd {
-    @JsonProperty("fixture")
-    private Fixture fixture;
-    @JsonProperty("bookmakers")
-    private ArrayList<Bookmaker> bookmakers;
+public class OddListDTO {
+    private ArrayList<OddDTO> response;
 }

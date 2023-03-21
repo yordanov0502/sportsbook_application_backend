@@ -1,4 +1,4 @@
-package com.example.sportsbook_application_backend.model.json.odd;
+package com.example.sportsbook_application_backend.model.dto.odd;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
@@ -10,9 +10,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class Value {
-    @JsonProperty("value")
+public class OddValueDTO {
     private String value;
-    @JsonProperty("odd")
     private String odd;
 }
