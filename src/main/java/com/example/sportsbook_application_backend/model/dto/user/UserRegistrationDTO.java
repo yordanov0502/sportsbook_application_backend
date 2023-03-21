@@ -1,4 +1,4 @@
-package com.example.sportsbook_application_backend.model.dto;
+package com.example.sportsbook_application_backend.model.dto.user;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

@@ -1,14 +1,11 @@
 package com.example.sportsbook_application_backend.controller;
 
-import com.example.sportsbook_application_backend.model.dto.UserChangePasswordDTO;
-import com.example.sportsbook_application_backend.model.dto.UserDTO;
+import com.example.sportsbook_application_backend.model.dto.user.UserChangePasswordDTO;
+import com.example.sportsbook_application_backend.model.dto.user.UserDTO;
 import com.example.sportsbook_application_backend.model.mapper.*;
-import com.example.sportsbook_application_backend.model.dto.UserLoginDTO;
-import com.example.sportsbook_application_backend.model.dto.UserRegistrationDTO;
+import com.example.sportsbook_application_backend.model.dto.user.UserLoginDTO;
+import com.example.sportsbook_application_backend.model.dto.user.UserRegistrationDTO;
 import com.example.sportsbook_application_backend.service.UserService;
-import com.sun.net.httpserver.Authenticator;
-import org.springframework.http.HttpStatusCode;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
