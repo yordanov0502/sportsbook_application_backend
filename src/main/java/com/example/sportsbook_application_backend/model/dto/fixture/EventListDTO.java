@@ -1,4 +1,4 @@
-package com.example.sportsbook_application_backend.model.json.fixture;
+package com.example.sportsbook_application_backend.model.dto.fixture;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
@@ -12,7 +12,7 @@ import java.util.ArrayList;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class FixturesList {
+public class EventListDTO {
     @JsonProperty("response")
-    private ArrayList<Fixtures> fixtures;
+    private ArrayList<EventDTO> events;
 }

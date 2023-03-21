@@ -1,4 +1,4 @@
-package com.example.sportsbook_application_backend.model.json.fixture;
+package com.example.sportsbook_application_backend.model.dto.fixture;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,7 +9,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Away {
+public class AwayTeamDTO {
     private String name;
     private boolean winner;
 }

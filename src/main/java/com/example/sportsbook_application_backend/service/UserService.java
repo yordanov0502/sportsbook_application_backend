@@ -1,10 +1,10 @@
 package com.example.sportsbook_application_backend.service;
 
 import com.example.sportsbook_application_backend.exception.*;
-import com.example.sportsbook_application_backend.model.dto.UserChangePasswordDTO;
-import com.example.sportsbook_application_backend.model.dto.UserLoginDTO;
-import com.example.sportsbook_application_backend.model.dto.UserRegistrationDTO;
-import com.example.sportsbook_application_backend.model.dto.UserDTO;
+import com.example.sportsbook_application_backend.model.dto.user.UserChangePasswordDTO;
+import com.example.sportsbook_application_backend.model.dto.user.UserLoginDTO;
+import com.example.sportsbook_application_backend.model.dto.user.UserRegistrationDTO;
+import com.example.sportsbook_application_backend.model.dto.user.UserDTO;
 import com.example.sportsbook_application_backend.model.entity.User;
 import com.example.sportsbook_application_backend.repository.UserRepository;
 import org.apache.commons.lang3.StringUtils;

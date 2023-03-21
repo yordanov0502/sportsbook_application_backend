@@ -1,4 +1,4 @@
-package com.example.sportsbook_application_backend.model.json.fixture;
+package com.example.sportsbook_application_backend.model.dto.fixture;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
@@ -10,9 +10,9 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Fixture {
+public class FixtureDTO {
     private Long id;
     @JsonProperty("date")
     private String datetime;
-    private Status status;
+    private FixtureStatusDTO status;
 }
