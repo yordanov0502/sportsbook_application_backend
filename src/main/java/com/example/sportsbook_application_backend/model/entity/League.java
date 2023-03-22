@@ -26,4 +26,10 @@ public class League {
     @Column(name = "country", nullable = false)
     private String country;
 
+    @Column(name = "type", nullable = false)
+    private String type;
+
+    @Column(name = "allowed", nullable = false)
+    private boolean allowed;
+
 }
