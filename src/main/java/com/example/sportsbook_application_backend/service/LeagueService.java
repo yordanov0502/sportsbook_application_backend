@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
-import java.util.Objects;
+import java.util.List;
 
 @Service
 public class LeagueService {
@@ -29,15 +29,19 @@ public class LeagueService {
     }
 
     public void callAPIForLeagues(){
+        String [] countries ={"World","Bulgaria","England","Spain","France","Italia","Germany"};
+        List<String> countriesList=List.of(countries);
+
         LeaguesResponseDTO leaguesResponse=restTemplate.getForObject("/leagues", LeaguesResponseDTO.class);
+
         for (LeaguesDTO leaguesDTO:leaguesResponse.getResponse()){
-            if((Objects.equals(leaguesDTO.getCountry().getName(), "World")||Objects.equals(leaguesDTO.getCountry().getName(), "Bulgaria")||Objects.equals(leaguesDTO.getCountry().getName(), "England")||
-                    Objects.equals(leaguesDTO.getCountry().getName(), "Spain")||Objects.equals(leaguesDTO.getCountry().getName(), "France")||Objects.equals(leaguesDTO.getCountry().getName(), "Italia")||
-                    Objects.equals(leaguesDTO.getCountry().getName(), "Germany"))&&leaguesDTO.getLeague().getId()<180) {
+            if(countriesList.contains(leaguesDTO.getCountry().getName())&&leaguesDTO.getLeague().getId()<180) {
                 League league = new League(leaguesDTO.getLeague().getId(), leaguesDTO.getLeague().getName(), leaguesDTO.getCountry().getName(), leaguesDTO.getLeague().getType(), false);
 
-                //Not sure if there is a better way of comparing the id to exact numbers
-                if (league.getId() == 1 || league.getId() == 2 || league.getId() == 3 || league.getId() == 4 || league.getId() == 5 || league.getId() == 9 || league.getId() == 10 || league.getId() == 39 || league.getId() == 40 || league.getId() == 45 || league.getId() == 48 || league.getId() == 61 || league.getId() == 62 || league.getId() == 65 || league.getId() == 66 || league.getId() == 78 || league.getId() == 79 || league.getId() == 81 || league.getId() == 140 || league.getId() == 143 || league.getId() == 172 || league.getId() == 173 || league.getId() == 174 || league.getId() == 175 || league.getId() == 176 || league.getId() == 177 || league.getId() == 178) {
+                Long [] leagues = {1L,2L,3L,4L,5L,9L,10L,39L,40L,45L,48L,61L,62L,65L,66L,78L,79L,81L,140L,141L,143L,172L,173L,174L,175L,176L,177L,178L};
+                List<Long> leaguesList = List.of(leagues);
+
+                if(leaguesList.contains(leaguesDTO.getLeague().getId())){
                     league.setAllowed(true);
                 }
 
