@@ -1,4 +1,4 @@
-package com.example.sportsbook_application_backend.model.dto.fixture;
+package com.example.sportsbook_application_backend.model.dto.league;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,6 +9,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class LeagueDTO {
-    private Long id;
+public class LeaguesDTO {
+    private LeagueDTO league;
+    private CountryDTO country;
 }
