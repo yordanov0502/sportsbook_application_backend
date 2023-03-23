@@ -9,6 +9,7 @@ import lombok.Setter;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -29,6 +30,9 @@ public class Event {
 
     @Column(name = "date_ttime", nullable = false)
     private LocalDateTime dateTime;
+
+    @Column(name = "date", nullable = false)
+    private LocalDate date;
 
     @Column(name = "home_team", nullable = false)
     private String homeTeam;
