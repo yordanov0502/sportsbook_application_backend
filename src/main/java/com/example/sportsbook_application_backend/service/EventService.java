@@ -49,4 +49,7 @@ public class EventService {
             }
         }
     }
+
+    public ArrayList<Event> getAllFixturesByDate(LocalDate localDate) { return eventRepository.getAllByDate(localDate);}
+
 }
