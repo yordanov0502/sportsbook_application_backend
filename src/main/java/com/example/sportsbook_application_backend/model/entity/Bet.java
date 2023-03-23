@@ -19,7 +19,7 @@ public class Bet {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "Bet_SEQ")
     @SequenceGenerator(name = "Bet_SEQ")
-    @Column(name = "id_bet", nullable = false)
+    @Column(name = "id_bet"/*, nullable = false*/)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
@@ -27,7 +27,7 @@ public class Bet {
     @JoinColumn(name = "event_id",referencedColumnName = "id_event", nullable = false)
     private Event event;
 
-    @Column(name = "outcome", nullable = false)
+    @Column(name = "outcome")
     private String outcome;
 
     @Column(name = "type", nullable = false)
