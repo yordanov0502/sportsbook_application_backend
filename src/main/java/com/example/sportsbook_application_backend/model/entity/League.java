@@ -29,6 +29,9 @@ public class League {
     @Column(name = "type", nullable = false)
     private String type;
 
+    @Column(name = "last_season", nullable = false)
+    private int season;
+
     @Column(name = "allowed", nullable = false)
     private boolean allowed;
 

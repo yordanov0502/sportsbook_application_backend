@@ -9,8 +9,6 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class EventDTO {
-    private FixtureDTO fixture;
-    private FixtureLeagueDTO league;
-    private FixtureTeamsDTO teams;
+public class FixtureLeagueDTO {
+    private Long id;
 }
