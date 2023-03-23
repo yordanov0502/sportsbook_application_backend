@@ -35,7 +35,8 @@ public class BetService {
         ArrayList<Event> events = eventService.getAllFixturesByDate(localDate);
         Map<Long,OddDTO> odds = new HashMap<>();
 
-        int pages = restTemplate.getForObject("/odds?date="+localDate+"&bookmaker=6&bet=1",OddResultDTO.class).getPaging().getTotal();//number of odd pages
+        //gets the number of pages with odds information for specific date
+        int pages = restTemplate.getForObject("/odds?date="+localDate+"&bookmaker=6&bet=1",OddResultDTO.class).getPaging().getTotal();
 
 
         //adding all odd responses into one list
