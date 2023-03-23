@@ -36,7 +36,7 @@ public class LeagueService {
 
         for (LeaguesDTO leaguesDTO:leaguesResponse.getResponse()){
             if(countriesList.contains(leaguesDTO.getCountry().getName())&&leaguesDTO.getLeague().getId()<180) {
-                League league = new League(leaguesDTO.getLeague().getId(), leaguesDTO.getLeague().getName(), leaguesDTO.getCountry().getName(), leaguesDTO.getLeague().getType(), false);
+                League league = new League(leaguesDTO.getLeague().getId(), leaguesDTO.getLeague().getName(), leaguesDTO.getCountry().getName(), leaguesDTO.getLeague().getType(),leaguesDTO.getSeasons().get(leaguesDTO.getSeasons().size()-1).getYear(), false);
 
                 Long [] leagues = {1L,2L,3L,4L,5L,9L,10L,39L,40L,45L,48L,61L,62L,65L,66L,78L,79L,81L,140L,141L,143L,172L,173L,174L,175L,176L,177L,178L};
                 List<Long> leaguesList = List.of(leagues);

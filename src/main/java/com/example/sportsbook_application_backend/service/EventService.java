@@ -27,7 +27,7 @@ public class EventService {
 
     public void callAPIForFixtures(){
         for(League league:leagueService.getLeagues()) {
-            EventListDTO eventsList = restTemplate.getForObject("/fixtures?date=" + LocalDate.now() + "&league=" + league.getId() + "&season=2022", EventListDTO.class);
+            EventListDTO eventsList = restTemplate.getForObject("/fixtures?date=" + LocalDate.now() + "&league=" + league.getId() + "&season="+league.getSeason(), EventListDTO.class);
             for (EventDTO eventDTO : eventsList.getEvents()) {
                 LocalDateTime dateTime = LocalDateTime.parse(eventDTO.getFixture().getDatetime().replace("+00:00", ""));
                 Event event = new Event(eventDTO.getFixture().getId(), league, dateTime, eventDTO.getTeams().getHome().getName(), eventDTO.getTeams().getAway().getName(), eventDTO.getFixture().getStatus().getStatus(), null);
