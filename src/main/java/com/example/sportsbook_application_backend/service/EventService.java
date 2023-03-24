@@ -29,14 +29,17 @@ public class EventService {
         this.eventRepository = eventRepository;
     }
 
-    public void callAPIForFixtures(){
+    public void callAPIForFixtures(String date){
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDate parsedDate = LocalDate.parse(date, formatter);
+
         for(League league:leagueService.getLeagues()) {
-            EventListDTO eventsList = restTemplate.getForObject("/fixtures?date=" + LocalDate.now() + "&league=" + league.getId() + "&season="+league.getSeason(), EventListDTO.class);
+            EventListDTO eventsList = restTemplate.getForObject("/fixtures?date=" + parsedDate + "&league=" + league.getId() + "&season="+league.getSeason(), EventListDTO.class);
             for (EventDTO eventDTO : eventsList.getEvents()) {
                 LocalDateTime dateTime = LocalDateTime.parse(eventDTO.getFixture().getDatetime().replace("+00:00", ""));
-                LocalDate date = LocalDate.parse(LocalDate.of(dateTime.getYear(), dateTime.getMonthValue(), dateTime.getDayOfMonth()).format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
 
-                Event event = new Event(eventDTO.getFixture().getId(), league, dateTime,date, eventDTO.getTeams().getHome().getName(), eventDTO.getTeams().getAway().getName(), eventDTO.getFixture().getStatus().getStatus(), null);
+                Event event = new Event(eventDTO.getFixture().getId(), league, dateTime,parsedDate, eventDTO.getTeams().getHome().getName(), eventDTO.getTeams().getAway().getName(), eventDTO.getFixture().getStatus().getStatus(), null);
 
                 if (eventDTO.getTeams().getHome().isWinner())
                     event.setResult(Type.ONE);

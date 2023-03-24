@@ -1,5 +1,6 @@
 package com.example.sportsbook_application_backend.model.entity;
 
+import com.example.sportsbook_application_backend.model.enums.Outcome;
 import com.example.sportsbook_application_backend.model.enums.Type;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -19,7 +20,7 @@ public class Bet {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "Bet_SEQ")
     @SequenceGenerator(name = "Bet_SEQ")
-    @Column(name = "id_bet"/*, nullable = false*/)
+    @Column(name = "id_bet")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
@@ -28,9 +29,11 @@ public class Bet {
     private Event event;
 
     @Column(name = "outcome")
-    private String outcome;
+    @Enumerated(EnumType.STRING)
+    private Outcome outcome;
 
     @Column(name = "type", nullable = false)
+    @Enumerated(EnumType.STRING)
     private Type type;
 
     @Column(name = "odd", nullable = false)
