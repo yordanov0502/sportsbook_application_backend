@@ -1,6 +1,6 @@
 package com.example.sportsbook_application_backend.model.entity;
 
-import com.example.sportsbook_application_backend.model.enums.Type;
+import com.example.sportsbook_application_backend.model.enums.ResultType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -45,6 +45,6 @@ public class Event {
 
     @Column(name = "result")
     @Enumerated(EnumType.STRING)
-    private Type result;
+    private ResultType result;
 
 }

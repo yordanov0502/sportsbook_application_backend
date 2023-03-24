@@ -1,7 +1,7 @@
 package com.example.sportsbook_application_backend.model.entity;
 
 import com.example.sportsbook_application_backend.model.enums.Outcome;
-import com.example.sportsbook_application_backend.model.enums.Type;
+import com.example.sportsbook_application_backend.model.enums.ResultType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -34,7 +34,7 @@ public class Bet {
 
     @Column(name = "type", nullable = false)
     @Enumerated(EnumType.STRING)
-    private Type type;
+    private ResultType type;
 
     @Column(name = "odd", nullable = false)
     private Float odd;
