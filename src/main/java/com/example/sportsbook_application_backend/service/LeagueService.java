@@ -38,7 +38,7 @@ public class LeagueService {
             if(countriesList.contains(leaguesDTO.getCountry().getName())&&leaguesDTO.getLeague().getId()<180) {
                 League league = new League(leaguesDTO.getLeague().getId(), leaguesDTO.getLeague().getName(), leaguesDTO.getCountry().getName(), leaguesDTO.getLeague().getType(),leaguesDTO.getSeasons().get(leaguesDTO.getSeasons().size()-1).getYear(), false);
 
-                Long [] leagues = {1L,2L,3L,4L,5L,9L,10L,39L,40L,45L,48L,61L,62L,65L,66L,78L,79L,81L,140L,141L,143L,172L,173L,174L,175L,176L,177L,178L};
+                Long [] leagues = {1L,2L,3L,4L,5L,9L,10L,39L,40L,45L,48L,61L,62L,65L,66L,78L,79L,81L,140L,141L,143L,172L,173L,174L};
                 List<Long> leaguesList = List.of(leagues);
 
                 if(leaguesList.contains(leaguesDTO.getLeague().getId())){
@@ -51,12 +51,12 @@ public class LeagueService {
     }
 
     public void setAllowedToLeague(Long id){
-        if(leagueRepository.countAllByAllowed(true)<30) {
+        if(leagueRepository.countAllByAllowed(true)<28) {
             League league = getLeagueById(id);
             league.setAllowed(true);
             leagueRepository.save(league);
         }else {
-            throw new UpdateException("The limit of 30 allowed leagues is reached");
+            throw new UpdateException("The limit of 28 allowed leagues is reached");
         }
     }
 
@@ -69,5 +69,7 @@ public class LeagueService {
     public ArrayList<League> getLeagues(){
         return leagueRepository.getAllByAllowed(true);
     }
+
+
 
 }
