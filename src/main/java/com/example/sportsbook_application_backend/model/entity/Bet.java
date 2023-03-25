@@ -23,7 +23,7 @@ public class Bet {
     @Column(name = "id_bet")
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @OnDelete(action = OnDeleteAction.CASCADE)//allows "foreign key on cascade delete"(deletes all bets when the event they were associated with is deleted)
     @JoinColumn(name = "event_id",referencedColumnName = "id_event", nullable = false)
     private Event event;
