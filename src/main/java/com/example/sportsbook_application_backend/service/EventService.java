@@ -4,9 +4,8 @@ import com.example.sportsbook_application_backend.model.dto.fixture.EventDTO;
 import com.example.sportsbook_application_backend.model.dto.fixture.EventListDTO;
 import com.example.sportsbook_application_backend.model.entity.Event;
 import com.example.sportsbook_application_backend.model.entity.League;
-import com.example.sportsbook_application_backend.model.enums.Type;
+import com.example.sportsbook_application_backend.model.enums.ResultType;
 import com.example.sportsbook_application_backend.repository.EventRepository;
-import com.fasterxml.jackson.databind.util.JSONPObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -15,7 +14,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.List;
 
 @Service
 public class EventService {
@@ -42,11 +40,11 @@ public class EventService {
                 Event event = new Event(eventDTO.getFixture().getId(), league, dateTime,parsedDate, eventDTO.getTeams().getHome().getName(), eventDTO.getTeams().getAway().getName(), eventDTO.getFixture().getStatus().getStatus(), null);
 
                 if (eventDTO.getTeams().getHome().isWinner())
-                    event.setResult(Type.ONE);
+                    event.setResult(ResultType.ONE);
                 else if (eventDTO.getTeams().getAway().isWinner())
-                    event.setResult(Type.TWO);
+                    event.setResult(ResultType.TWO);
                 else if (event.getStatus().contains("Match Finished"))
-                    event.setResult(Type.ZERO);
+                    event.setResult(ResultType.ZERO);
 
                 eventRepository.save(event);
             }
