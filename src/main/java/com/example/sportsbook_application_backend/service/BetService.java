@@ -31,34 +31,29 @@ public class BetService {
     @Autowired
     private LeagueService leagueService;
 
-    public void callAPIForOddsByDate(String date){
+    public int callAPIForOddsByDate(String date) {
+        int numberOfFixtures=0;
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         LocalDate parsedDate = LocalDate.parse(date, formatter);
 
         ArrayList<Event> events = eventService.getAllFixturesByDate(parsedDate);
-        Map<Long,OddDTO> odds = new HashMap<>();
+        Map<Long, OddDTO> odds = new HashMap<>();
 
-
-
-        for(League league:leagueService.getLeagues()) {
+        for (League league : leagueService.getAllowedLeagues()) {
             //adding all odd responses into one list
-            List<OddDTO> oddDTOList = restTemplate.getForObject("/odds?league="+league.getId()+"&season="+league.getSeason()+"&date="+parsedDate+"&bookmaker=8&bet=1",OddResultDTO.class).getResponse();
-            for(OddDTO oddDTO: oddDTOList)
-            {
+            List<OddDTO> oddDTOList = restTemplate.getForObject("/odds?league=" + league.getId() + "&season=" + league.getSeason() + "&date=" + parsedDate + "&bookmaker=8&bet=1", OddResultDTO.class).getResponse();
+            for (OddDTO oddDTO : oddDTOList) {
                 odds.put(oddDTO.getFixture().getId(), oddDTO);
+                numberOfFixtures++;
             }
         }
 
-
-
-        for(Event event : events)
-        {
-            if(odds.containsKey(event.getId()))
-            {
-                Bet betHome = new Bet(null, event, Outcome.PENDING, ResultType.ONE,Float.parseFloat(odds.get(event.getId()).getBookmakers().get(0).getBets().get(0).getValues().get(0).getOdd()));
-                Bet betDraw = new Bet(null, event,Outcome.PENDING, ResultType.ZERO,Float.parseFloat(odds.get(event.getId()).getBookmakers().get(0).getBets().get(0).getValues().get(1).getOdd()));
-                Bet betAway = new Bet(null, event,Outcome.PENDING, ResultType.TWO,Float.parseFloat(odds.get(event.getId()).getBookmakers().get(0).getBets().get(0).getValues().get(2).getOdd()));
+        for (Event event : events) {
+            if (odds.containsKey(event.getId())) {
+                Bet betHome = new Bet(null, event, Outcome.PENDING, ResultType.ONE, Float.parseFloat(odds.get(event.getId()).getBookmakers().get(0).getBets().get(0).getValues().get(0).getOdd()));
+                Bet betDraw = new Bet(null, event, Outcome.PENDING, ResultType.ZERO, Float.parseFloat(odds.get(event.getId()).getBookmakers().get(0).getBets().get(0).getValues().get(1).getOdd()));
+                Bet betAway = new Bet(null, event, Outcome.PENDING, ResultType.TWO, Float.parseFloat(odds.get(event.getId()).getBookmakers().get(0).getBets().get(0).getValues().get(2).getOdd()));
 
                 betRepository.save(betHome);
                 betRepository.save(betDraw);
@@ -66,5 +61,23 @@ public class BetService {
             }
         }
 
+        return numberOfFixtures;
+    }
+
+    public void resolveBets(String  date){
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDate localDate = LocalDate.parse(date, formatter);
+
+        ArrayList<Bet> bets = betRepository.getBetByOutcome(Outcome.PENDING);
+        for (Bet bet:bets) {
+            if (localDate.equals(bet.getEvent().getDate())) {
+                if (bet.getType() == bet.getEvent().getResult()) {
+                    bet.setOutcome(Outcome.WON);
+                } else {
+                    bet.setOutcome(Outcome.LOST);
+                }
+                betRepository.save(bet);
+            }
         }
     }
+}

@@ -8,4 +8,5 @@ import java.util.ArrayList;
 
 public interface EventRepository extends JpaRepository<Event,Long> {
     ArrayList<Event> getAllByDate(LocalDate localDate);
+    ArrayList<Event> getAllByStatusAndDate(String status, LocalDate date);
 }

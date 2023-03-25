@@ -23,12 +23,12 @@ public class Event {
     @Column(name = "id_event", nullable = false)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @OnDelete(action = OnDeleteAction.CASCADE)//allows "foreign key on cascade delete"(deletes all events when the league they were associated with is deleted)
     @JoinColumn(name = "league_id",referencedColumnName = "id_league", nullable = false)
     private League league;
 
-    @Column(name = "date_ttime", nullable = false)
+    @Column(name = "date_time", nullable = false)
     private LocalDateTime dateTime;
 
     @Column(name = "date", nullable = false)
@@ -40,7 +40,7 @@ public class Event {
     @Column(name = "away_team", nullable = false)
     private String awayTeam;
 
-    @Column(name = "finished", nullable = false)
+    @Column(name = "status", nullable = false)
     private String status;
 
     @Column(name = "result")

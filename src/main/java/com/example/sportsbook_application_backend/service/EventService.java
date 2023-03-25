@@ -27,12 +27,13 @@ public class EventService {
         this.eventRepository = eventRepository;
     }
 
-    public void callAPIForFixtures(String date){
+    public int callAPIForFixtures(String date){
+        int numberOfFixtures=0;
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         LocalDate parsedDate = LocalDate.parse(date, formatter);
 
-        for(League league:leagueService.getLeagues()) {
+        for(League league:leagueService.getAllowedLeagues()) {
             EventListDTO eventsList = restTemplate.getForObject("/fixtures?date=" + parsedDate + "&league=" + league.getId() + "&season="+league.getSeason(), EventListDTO.class);
             for (EventDTO eventDTO : eventsList.getEvents()) {
                 LocalDateTime dateTime = LocalDateTime.parse(eventDTO.getFixture().getDatetime().replace("+00:00", ""));
@@ -47,10 +48,49 @@ public class EventService {
                     event.setResult(ResultType.ZERO);
 
                 eventRepository.save(event);
+                numberOfFixtures++;
             }
         }
+        return numberOfFixtures;
     }
 
     public ArrayList<Event> getAllFixturesByDate(LocalDate localDate) { return eventRepository.getAllByDate(localDate);}
+
+    public ArrayList<Event> getAllFixturesByDate(String date) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDate localDate = LocalDate.parse(date, formatter);
+        return eventRepository.getAllByDate(localDate);
+    }
+
+    public int simulateFixturesByDate(String date){
+        int numberOfFixtures=0;
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDate localDate = LocalDate.parse(date, formatter);
+        ArrayList<Event> events=eventRepository.getAllByStatusAndDate("Not Started", localDate);
+        for (Event event:events){
+            event.setStatus("Match Finished");
+
+            switch (sim()) {
+                case 0 -> {
+                    event.setResult(ResultType.ZERO);
+                    eventRepository.save(event);
+                }
+                case 1 -> {
+                    event.setResult(ResultType.ONE);
+                    eventRepository.save(event);
+                }
+                case 2 -> {
+                    event.setResult(ResultType.TWO);
+                    eventRepository.save(event);
+                }
+            }
+            numberOfFixtures++;
+        }
+        return numberOfFixtures;
+    }
+
+    public int sim(){
+        return (int)(Math.random()*3);
+    }
 
 }

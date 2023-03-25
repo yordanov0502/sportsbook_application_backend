@@ -9,9 +9,6 @@ import lombok.Setter;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @Entity
 @Getter
 @Setter
@@ -25,12 +22,12 @@ public class Slip {
     @Column(name = "id_slip")
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @OnDelete(action = OnDeleteAction.CASCADE)//allows "foreign key on cascade delete"(deletes all slips when the user they were associated with is deleted)
     @JoinColumn(name = "user_id",referencedColumnName = "id_user", nullable = false)
     private User user;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @OnDelete(action = OnDeleteAction.CASCADE)//allows "foreign key on cascade delete"(deletes all slips when the bet they were associated with is deleted)
     @JoinColumn(name = "bet_id",referencedColumnName = "id_bet", nullable = false)
     private Bet bet;
