@@ -5,13 +5,11 @@ import com.example.sportsbook_application_backend.model.entity.League;
 import com.example.sportsbook_application_backend.service.BetService;
 import com.example.sportsbook_application_backend.service.EventService;
 import com.example.sportsbook_application_backend.service.LeagueService;
+import com.example.sportsbook_application_backend.service.SlipService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,21 +23,24 @@ public class AdminController {
     private EventService eventService;
     @Autowired
     private BetService betService;
+    @Autowired
+    private SlipService slipService;
 
-    @GetMapping("/simulate")
+    @PostMapping("/simulate")
     public ResponseEntity<String> simulateFixtures(@RequestParam String date){
         int numberOfFixtures = eventService.simulateFixturesByDate(date);
         betService.resolveBets(date);
-        return new ResponseEntity<>(numberOfFixtures+ " fixtures for date:"+date+" have been simulated successful.", HttpStatus.OK);
+        slipService.resolveSlips(date);
+        return new ResponseEntity<>(numberOfFixtures+ " fixtures for date: "+date+" have been simulated successfully.", HttpStatus.OK);
     }
 
-    @GetMapping("/allowLeague")
+    @PostMapping("/allowLeague")
     public ResponseEntity<String> allowLeague(@RequestParam Long id){
         String league = leagueService.allowLeague(id);
         return new ResponseEntity<>(league+" has been allowed.", HttpStatus.OK);
     }
 
-    @GetMapping("/disallowLeague")
+    @PostMapping("/disallowLeague")
     public ResponseEntity<String> disallowLeague(@RequestParam Long id){
         String league = leagueService.disallowLeague(id);
         return new ResponseEntity<>(league+" has been disallowed.", HttpStatus.OK);

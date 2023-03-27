@@ -34,15 +34,12 @@ public class BetService {
     public int callAPIForOddsByDate(String date) {
         int numberOfFixtures=0;
 
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        LocalDate parsedDate = LocalDate.parse(date, formatter);
-
-        ArrayList<Event> events = eventService.getAllFixturesByDate(parsedDate);
+        ArrayList<Event> events = eventService.getAllFixturesByDate(date);
         Map<Long, OddDTO> odds = new HashMap<>();
 
         for (League league : leagueService.getAllowedLeagues()) {
-            //adding all odd responses into one list
-            List<OddDTO> oddDTOList = restTemplate.getForObject("/odds?league=" + league.getId() + "&season=" + league.getSeason() + "&date=" + parsedDate + "&bookmaker=8&bet=1", OddResultDTO.class).getResponse();
+            //adding all odds for specific date and league into one list
+            List<OddDTO> oddDTOList = restTemplate.getForObject("/odds?league=" + league.getId() + "&season=" + league.getSeason() + "&date=" + date + "&bookmaker=8&bet=1", OddResultDTO.class).getResponse();
             for (OddDTO oddDTO : oddDTOList) {
                 odds.put(oddDTO.getFixture().getId(), oddDTO);
                 numberOfFixtures++;

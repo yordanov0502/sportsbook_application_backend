@@ -54,7 +54,6 @@ public class EventService {
         return numberOfFixtures;
     }
 
-    public ArrayList<Event> getAllFixturesByDate(LocalDate localDate) { return eventRepository.getAllByDate(localDate);}
 
     public ArrayList<Event> getAllFixturesByDate(String date) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
