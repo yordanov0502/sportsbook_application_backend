@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
 @ControllerAdvice
-public class FieldExceptionHandler {
+public class CustomExceptionHandler {
 
     @ExceptionHandler
     public ProblemDetail handleException(FieldException fieldException){
@@ -36,6 +36,16 @@ public class FieldExceptionHandler {
     @ExceptionHandler
     public ProblemDetail handleException(DuplicatePasswordException duplicatePasswordException){
         return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, duplicatePasswordException.getMessage());
+    }
+
+    @ExceptionHandler
+    public ProblemDetail handleException(NonexistentDataException nonexistentDataException){
+        return ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, nonexistentDataException.getMessage());
+    }
+
+    @ExceptionHandler
+    public ProblemDetail handleException(UserStatusException userStatusException){
+        return ProblemDetail.forStatusAndDetail(HttpStatus.FORBIDDEN, userStatusException.getMessage());
     }
 
 }

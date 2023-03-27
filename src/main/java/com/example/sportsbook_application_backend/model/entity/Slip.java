@@ -39,4 +39,13 @@ public class Slip {
     @Enumerated(EnumType.STRING)
     private Outcome outcome;
 
+    @Override
+    public String toString() {
+        return "Slip{" +
+                "id=" + id +
+                ", bet=" + bet +
+                ", stake=" + stake +
+                ", outcome=" + outcome +
+                '}';
+    }
 }

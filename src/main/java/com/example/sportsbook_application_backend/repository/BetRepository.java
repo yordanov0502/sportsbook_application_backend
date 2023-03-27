@@ -8,4 +8,5 @@ import java.util.ArrayList;
 
 public interface BetRepository extends JpaRepository<Bet, Long> {
     ArrayList<Bet> getBetByOutcome(Outcome outcome);
+    Bet getBetById(Long id);
 }

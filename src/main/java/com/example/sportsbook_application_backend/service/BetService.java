@@ -1,10 +1,10 @@
 package com.example.sportsbook_application_backend.service;
 
+import com.example.sportsbook_application_backend.exception.FieldException;
+import com.example.sportsbook_application_backend.exception.NonexistentDataException;
 import com.example.sportsbook_application_backend.model.dto.odd.OddDTO;
 import com.example.sportsbook_application_backend.model.dto.odd.OddResultDTO;
-import com.example.sportsbook_application_backend.model.entity.Bet;
-import com.example.sportsbook_application_backend.model.entity.Event;
-import com.example.sportsbook_application_backend.model.entity.League;
+import com.example.sportsbook_application_backend.model.entity.*;
 import com.example.sportsbook_application_backend.model.enums.Outcome;
 import com.example.sportsbook_application_backend.model.enums.ResultType;
 import com.example.sportsbook_application_backend.repository.BetRepository;
@@ -14,10 +14,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class BetService {
@@ -30,6 +27,8 @@ public class BetService {
     private RestTemplate restTemplate;
     @Autowired
     private LeagueService leagueService;
+    @Autowired
+    private UserService userService;
 
     public int callAPIForOddsByDate(String date) {
         int numberOfFixtures=0;
@@ -77,4 +76,14 @@ public class BetService {
             }
         }
     }
+
+    public boolean isBetExists(Long id){
+        return betRepository.existsById(id);
+    }
+
+    public Bet getBetById(Long id){
+        return betRepository.getBetById(id);
+    }
+
+
 }
