@@ -5,6 +5,7 @@ import com.example.sportsbook_application_backend.model.entity.League;
 import com.example.sportsbook_application_backend.service.BetService;
 import com.example.sportsbook_application_backend.service.EventService;
 import com.example.sportsbook_application_backend.service.LeagueService;
+import com.example.sportsbook_application_backend.service.SlipService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,11 +23,14 @@ public class AdminController {
     private EventService eventService;
     @Autowired
     private BetService betService;
+    @Autowired
+    private SlipService slipService;
 
     @PostMapping("/simulate")
     public ResponseEntity<String> simulateFixtures(@RequestParam String date){
         int numberOfFixtures = eventService.simulateFixturesByDate(date);
         betService.resolveBets(date);
+        slipService.resolveSlips(date);
         return new ResponseEntity<>(numberOfFixtures+ " fixtures for date: "+date+" have been simulated successfully.", HttpStatus.OK);
     }
 

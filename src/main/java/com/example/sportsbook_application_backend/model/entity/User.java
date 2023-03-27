@@ -1,5 +1,6 @@
 package com.example.sportsbook_application_backend.model.entity;
 
+import com.example.sportsbook_application_backend.model.enums.UserStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -38,6 +39,7 @@ public class User {
     private Float balance;
 
     @Column(name = "status", nullable = false)
-    private String status;
+    @Enumerated(EnumType.STRING)
+    private UserStatus status;
 
 }

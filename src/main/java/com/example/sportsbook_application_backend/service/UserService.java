@@ -6,11 +6,13 @@ import com.example.sportsbook_application_backend.model.dto.user.UserLoginDTO;
 import com.example.sportsbook_application_backend.model.dto.user.UserRegistrationDTO;
 import com.example.sportsbook_application_backend.model.dto.user.UserDTO;
 import com.example.sportsbook_application_backend.model.entity.User;
+import com.example.sportsbook_application_backend.model.enums.UserStatus;
 import com.example.sportsbook_application_backend.repository.UserRepository;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -27,9 +29,13 @@ public class UserService {
         this.passwordEncoder = passwordEncoder;
     }
 
+    public void updateUser(User user) {userRepository.save(user);}
+
     public User getUserByUsername(String username) {return userRepository.findUserByUsername(username);}
 
     public User getUserById(Long id) {return userRepository.findUserByUserId(id);}
+
+    public ArrayList<User> getAllUsersByStatus(UserStatus status) {return userRepository.getAllByStatus(status);}
 
     public static boolean validateName(String firstName) {
         String regex = "^[A-Z]{1}([a-z]{2,20})$";
@@ -162,7 +168,7 @@ public class UserService {
         user.setUsername(userRegistrationDTO.getUsername());
         user.setHash(passwordEncoder.encode(password));
         user.setBalance(200F);
-        user.setStatus("active");
+        user.setStatus(UserStatus.ACTIVE);
         userRepository.save(user);
 
         //checks if user registration was successful
