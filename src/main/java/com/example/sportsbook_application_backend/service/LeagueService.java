@@ -38,7 +38,7 @@ public class LeagueService {
         LeaguesResponseDTO leaguesResponse=restTemplate.getForObject("/leagues", LeaguesResponseDTO.class);
 
         for (LeaguesDTO leaguesDTO:leaguesResponse.getResponse()){
-            if(countriesList.contains(leaguesDTO.getCountry().getName())/*&&leaguesDTO.getLeague().getId()<180*/) {
+            if(countriesList.contains(leaguesDTO.getCountry().getName())) {
                 League league = new League(leaguesDTO.getLeague().getId(), leaguesDTO.getLeague().getName(), leaguesDTO.getCountry().getName(), leaguesDTO.getLeague().getType(),leaguesDTO.getSeasons().get(leaguesDTO.getSeasons().size()-1).getYear(), false);
 
                 if(leaguesList.contains(leaguesDTO.getLeague().getId())){
