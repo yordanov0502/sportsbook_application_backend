@@ -37,6 +37,7 @@ public class UserService {
 
     public ArrayList<User> getAllUsersByStatus(UserStatus status) {return userRepository.getAllByStatus(status);}
 
+
     public static boolean validateName(String firstName) {
         String regex = "^[A-Z]{1}([a-z]{2,20})$";
 
@@ -157,6 +158,10 @@ public class UserService {
 
     public boolean isUsernameExists(String username) {
         return userRepository.existsUserByUsername(username);
+    }
+
+    public boolean isUserExists(Long id){
+        return userRepository.existsById(id);
     }
 
     public void createUser(UserRegistrationDTO userRegistrationDTO){
