@@ -4,11 +4,13 @@ import com.example.sportsbook_application_backend.exception.FieldException;
 import com.example.sportsbook_application_backend.exception.NonexistentDataException;
 import com.example.sportsbook_application_backend.exception.UpdateException;
 import com.example.sportsbook_application_backend.exception.UserStatusException;
+import com.example.sportsbook_application_backend.model.dto.slip.SlipDTO;
 import com.example.sportsbook_application_backend.model.entity.Bet;
 import com.example.sportsbook_application_backend.model.entity.Slip;
 import com.example.sportsbook_application_backend.model.entity.User;
 import com.example.sportsbook_application_backend.model.enums.Outcome;
 import com.example.sportsbook_application_backend.model.enums.UserStatus;
+import com.example.sportsbook_application_backend.model.mapper.SlipMapper;
 import com.example.sportsbook_application_backend.repository.SlipRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -28,6 +30,8 @@ public class SlipService {
     private UserService userService;
     @Autowired
     private BetService betService;
+    @Autowired
+    private SlipMapper slipMapper;
 
     public void resolveSlips(String  date){
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
@@ -83,9 +87,9 @@ public class SlipService {
         if(!bet.getOutcome().equals(Outcome.PENDING))
             throw new FieldException("Bet with id:"+bet.getId()+" has already expired.");
 
-
+        float expectedProfit = stake * bet.getOdd();
         int slipQuantityBefore= slipRepository.countAllByUser(user);
-        Slip slip = new Slip(null,user,betService.getBetById(betId),stake,Outcome.PENDING);
+        Slip slip = new Slip(null,user,bet,stake,expectedProfit,Outcome.PENDING);
         slipRepository.save(slip);
         int slipQuantityAfter = slipRepository.countAllByUser(user);
 
@@ -97,12 +101,22 @@ public class SlipService {
         else throw new UpdateException("Slip was NOT created. Please try again.");
     }
 
-    public ArrayList<Slip> getBetHistoryByUserId(Long id){
+    public ArrayList<SlipDTO> getBetHistoryByUserId(Long id){
 
         if(!userService.isUserExists(id))
-            throw new NonexistentDataException("User with id:"+id+", does NOT exist in the database.");
+            throw new NonexistentDataException("User with id:"+id+" does NOT exist in the database.");
 
-        return slipRepository.getExpiredBetsOfUser(userService.getUserById(id));
+        ArrayList<Slip> expiredSlips = slipRepository.getExpiredBetsOfUser(userService.getUserById(id));
+        if(expiredSlips.isEmpty())
+            throw new NonexistentDataException("User with id:"+id+" does NOT have any expired bets yet.");
+
+        ArrayList<SlipDTO> slipDTOS = new ArrayList<>();
+        for(Slip slip: expiredSlips)
+        {
+            slipDTOS.add(slipMapper.mapToSlipDTO(slip));
+        }
+
+        return slipDTOS;
     }
 
 }

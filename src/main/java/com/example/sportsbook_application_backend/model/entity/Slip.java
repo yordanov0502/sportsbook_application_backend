@@ -35,17 +35,10 @@ public class Slip {
     @Column(name = "stake", nullable = false)
     private Float stake;
 
+    @Column(name = "expected_profit", nullable = false)
+    private Float expectedProfit;
+
     @Column(name = "state", nullable = false)
     @Enumerated(EnumType.STRING)
     private Outcome outcome;
-
-    @Override
-    public String toString() {
-        return "Slip{" +
-                "id=" + id +
-                ", bet=" + bet +
-                ", stake=" + stake +
-                ", outcome=" + outcome +
-                '}';
-    }
 }
