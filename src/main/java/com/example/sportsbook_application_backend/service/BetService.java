@@ -49,15 +49,18 @@ public class BetService {
                 {
                     Event event = eventService.getFixtureById(oddDTO.getFixture().getId());
 
-                    Bet betHome = new Bet(null, event, Outcome.PENDING, ResultType.ONE, Float.parseFloat(oddDTO.getBookmakers().get(0).getBets().get(0).getValues().get(0).getOdd()));
-                    Bet betDraw = new Bet(null, event, Outcome.PENDING, ResultType.ZERO, Float.parseFloat(oddDTO.getBookmakers().get(0).getBets().get(0).getValues().get(1).getOdd()));
-                    Bet betAway = new Bet(null, event, Outcome.PENDING, ResultType.TWO, Float.parseFloat(oddDTO.getBookmakers().get(0).getBets().get(0).getValues().get(2).getOdd()));
+                    if(!betRepository.existsBetByEvent(event))
+                    {
+                        Bet betHome = new Bet(null, event, Outcome.PENDING, ResultType.ONE, Float.parseFloat(oddDTO.getBookmakers().get(0).getBets().get(0).getValues().get(0).getOdd()));
+                        Bet betDraw = new Bet(null, event, Outcome.PENDING, ResultType.ZERO, Float.parseFloat(oddDTO.getBookmakers().get(0).getBets().get(0).getValues().get(1).getOdd()));
+                        Bet betAway = new Bet(null, event, Outcome.PENDING, ResultType.TWO, Float.parseFloat(oddDTO.getBookmakers().get(0).getBets().get(0).getValues().get(2).getOdd()));
 
-                    betRepository.save(betHome);
-                    betRepository.save(betDraw);
-                    betRepository.save(betAway);
+                        betRepository.save(betHome);
+                        betRepository.save(betDraw);
+                        betRepository.save(betAway);
 
-                    numberOfFixtures++;
+                        numberOfFixtures++;
+                    }
                 }
             }
         }
