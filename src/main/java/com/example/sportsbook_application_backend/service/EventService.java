@@ -61,6 +61,10 @@ public class EventService {
         return eventRepository.getAllByDate(localDate);
     }
 
+    public Event getFixtureById(Long id){return eventRepository.getById(id);}
+
+    public boolean fixtureExists(Long id){return eventRepository.existsEventById(id);}
+
     public int simulateFixturesByDate(String date){
         int numberOfFixtures=0;
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
