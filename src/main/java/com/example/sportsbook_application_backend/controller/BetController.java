@@ -1,7 +1,6 @@
 package com.example.sportsbook_application_backend.controller;
 
 import com.example.sportsbook_application_backend.model.dto.slip.SlipDTO;
-import com.example.sportsbook_application_backend.service.BetService;
 import com.example.sportsbook_application_backend.service.SlipService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

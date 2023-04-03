@@ -1,6 +1,5 @@
 package com.example.sportsbook_application_backend.model.enums;
 
-public enum RoleType {
-    ADMIN,
-    USER
+public enum TokenType {
+    BEARER
 }
