@@ -2,6 +2,7 @@ package com.example.sportsbook_application_backend.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
@@ -48,4 +49,8 @@ public class CustomExceptionHandler {
         return ProblemDetail.forStatusAndDetail(HttpStatus.FORBIDDEN, userStatusException.getMessage());
     }
 
+    @ExceptionHandler
+    public ProblemDetail handleException(BadCredentialsException badCredentialsException){
+        return ProblemDetail.forStatusAndDetail(HttpStatus.FORBIDDEN, badCredentialsException.getMessage());
+    }
 }

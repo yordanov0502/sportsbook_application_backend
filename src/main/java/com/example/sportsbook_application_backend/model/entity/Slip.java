@@ -18,7 +18,7 @@ import org.hibernate.annotations.OnDeleteAction;
 public class Slip {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "Slip_SEQ")
-    @SequenceGenerator(name = "Slip_SEQ")
+    @SequenceGenerator(name = "Slip_SEQ", allocationSize = 1)
     @Column(name = "id_slip")
     private Long id;
 
