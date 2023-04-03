@@ -6,9 +6,11 @@ import com.example.sportsbook_application_backend.model.dto.user.UserLoginDTO;
 import com.example.sportsbook_application_backend.model.dto.user.UserRegistrationDTO;
 import com.example.sportsbook_application_backend.model.dto.user.UserDTO;
 import com.example.sportsbook_application_backend.model.entity.User;
+import com.example.sportsbook_application_backend.model.enums.RoleType;
 import com.example.sportsbook_application_backend.model.enums.UserStatus;
 import com.example.sportsbook_application_backend.repository.UserRepository;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -174,6 +176,7 @@ public class UserService {
         user.setHash(passwordEncoder.encode(password));
         user.setBalance(200F);
         user.setStatus(UserStatus.ACTIVE);
+        user.setRole(RoleType.USER);
         userRepository.save(user);
 
         //checks if user registration was successful
