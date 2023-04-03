@@ -22,7 +22,7 @@ public class UserDetailsServiceConfig implements UserDetailsService {
         if (profile == null) {
             throw new UsernameNotFoundException(username);
         }
-        UserDetails user= User.withUsername(profile.getUsername()).password(profile.getHash()).roles(profile.getRole().toString()).build();
+        UserDetails user= User.withUsername(profile.getUsername()).password(profile.getPassword()).roles(profile.getRole().toString()).build();
         return user;
     }
 

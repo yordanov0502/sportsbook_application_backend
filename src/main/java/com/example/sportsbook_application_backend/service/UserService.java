@@ -1,21 +1,26 @@
 package com.example.sportsbook_application_backend.service;
 
+import com.example.sportsbook_application_backend.config.JwtService;
 import com.example.sportsbook_application_backend.exception.*;
 import com.example.sportsbook_application_backend.model.dto.user.UserChangePasswordDTO;
 import com.example.sportsbook_application_backend.model.dto.user.UserLoginDTO;
 import com.example.sportsbook_application_backend.model.dto.user.UserRegistrationDTO;
 import com.example.sportsbook_application_backend.model.dto.user.UserDTO;
 import com.example.sportsbook_application_backend.model.entity.User;
-import com.example.sportsbook_application_backend.model.enums.RoleType;
+import com.example.sportsbook_application_backend.model.enums.Role;
 import com.example.sportsbook_application_backend.model.enums.UserStatus;
 import com.example.sportsbook_application_backend.repository.UserRepository;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -24,11 +29,13 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtService jwtService;
 
 
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtService jwtService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.jwtService = jwtService;
     }
 
     public void updateUser(User user) {userRepository.save(user);}
@@ -167,23 +174,43 @@ public class UserService {
     }
 
     public void createUser(UserRegistrationDTO userRegistrationDTO){
-        String password= userRegistrationDTO.getPassword();
-        User user=new User();
-        user.setFirstName(userRegistrationDTO.getFirstName());
-        user.setLastName(userRegistrationDTO.getLastName());
-        user.setEmail(userRegistrationDTO.getEmail());
-        user.setUsername(userRegistrationDTO.getUsername());
-        user.setHash(passwordEncoder.encode(password));
-        user.setBalance(200F);
-        user.setStatus(UserStatus.ACTIVE);
-        user.setRole(RoleType.USER);
+
+        User user = User.builder()
+                .firstName(userRegistrationDTO.getFirstName())
+                .lastName(userRegistrationDTO.getLastName())
+                .email(userRegistrationDTO.getEmail())
+                .username(userRegistrationDTO.getUsername())
+                .password(passwordEncoder.encode(userRegistrationDTO.getPassword()))
+                .balance(200F)
+                .status(UserStatus.ACTIVE)
+                .role(Role.USER)
+                .build();
+
         userRepository.save(user);
 
-        //checks if user registration was successful
+        //checks if user registration was successful(user was added to database)
         if(!isUsernameExists(user.getUsername()))
-        throw new UpdateException("Error when creating user registration. Please try again.");
+            throw new UpdateException("Error when creating user registration. Please try again.");
     }
 
+    /*
+    public void checkUserCredentials(UserLoginDTO userLoginDTO){
+        if(userRepository.existsUserByUsername(userLoginDTO.getUsername()))
+        {
+            User user = userRepository.findUserByUsername(userLoginDTO.getUsername());
+            if(!passwordEncoder.matches(userLoginDTO.getPassword(), user.getPassword()))
+                throw new WrongCredentialsException("Wrong credentials!");
+        }
+        else {throw new WrongCredentialsException("Wrong credentials!");}
+    }*/
+
+
+    public Authentication validateUser(String username, String password) throws AuthenticationException {
+        Optional<User> user = userRepository.findByUsername(username);
+        if (user.isPresent() && passwordEncoder.matches(password, user.get().getPassword()))
+            return new UsernamePasswordAuthenticationToken(user.get().getUserId(), password, user.get().getAuthorities());
+        throw new BadCredentialsException("Invalid credentials");
+    }
 
     public void editUser(UserDTO userDTO){
         User user=getUserById(userDTO.getId());
@@ -196,31 +223,21 @@ public class UserService {
 
     public void changePassword(UserChangePasswordDTO userChangePasswordDTO){
         User user=getUserById(userChangePasswordDTO.getId());
-        user.setHash(passwordEncoder.encode(userChangePasswordDTO.getNewPassword()));
+        user.setPassword(passwordEncoder.encode(userChangePasswordDTO.getNewPassword()));
         userRepository.save(user);
 
-        if(!user.getHash().equals(getUserById(userChangePasswordDTO.getId()).getHash()))
+        if(!user.getPassword().equals(getUserById(userChangePasswordDTO.getId()).getPassword()))
         throw new UpdateException("Unsuccessful password update. Please try again.");
-    }
-
-    public void checkUserCredentials(UserLoginDTO userLoginDTO){
-        if(userRepository.existsUserByUsername(userLoginDTO.getUsername()))
-        {
-            User user = userRepository.findUserByUsername(userLoginDTO.getUsername());
-            if(!passwordEncoder.matches(userLoginDTO.getPassword(), user.getHash()))
-                throw new WrongCredentialsException("Wrong credentials!");
-        }
-        else {throw new WrongCredentialsException("Wrong credentials!");}
     }
 
     public void validatePasswordChange(UserChangePasswordDTO userChangePasswordDTO)
     {
         User user = getUserById(userChangePasswordDTO.getId());
 
-        if(!passwordEncoder.matches(userChangePasswordDTO.getOldPassword(), user.getHash()))
+        if(!passwordEncoder.matches(userChangePasswordDTO.getOldPassword(), user.getPassword()))
             throw new WrongCredentialsException("Wrong old password. Please provide a valid password.");
 
-        if(passwordEncoder.matches(userChangePasswordDTO.getNewPassword(),user.getHash()))
+        if(passwordEncoder.matches(userChangePasswordDTO.getNewPassword(),user.getPassword()))
             throw new DuplicatePasswordException("Please enter a password different from the old one.\"");
     }
 }
