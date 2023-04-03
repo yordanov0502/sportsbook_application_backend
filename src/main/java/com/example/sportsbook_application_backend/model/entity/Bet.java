@@ -19,7 +19,7 @@ import org.hibernate.annotations.OnDeleteAction;
 public class Bet {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "Bet_SEQ")
-    @SequenceGenerator(name = "Bet_SEQ")
+    @SequenceGenerator(name = "Bet_SEQ", allocationSize = 1)
     @Column(name = "id_bet")
     private Long id;
 

@@ -14,8 +14,6 @@ import java.util.ArrayList;
 public class BetController {
 
     @Autowired
-    private BetService betService;
-    @Autowired
     private SlipService slipService;
 
 
