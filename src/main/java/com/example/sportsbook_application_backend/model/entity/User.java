@@ -1,5 +1,6 @@
 package com.example.sportsbook_application_backend.model.entity;
 
+import com.example.sportsbook_application_backend.model.enums.RoleType;
 import com.example.sportsbook_application_backend.model.enums.UserStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -20,13 +21,13 @@ public class User {
     @Column(name = "id_user", nullable = false)
     private Long userId;
 
-    @Column(name = "first_name", nullable = false)
+    @Column(name = "first_name")
     private String firstName;
 
-    @Column(name = "last_name", nullable = false)
+    @Column(name = "last_name")
     private String lastName;
 
-    @Column(name = "email", nullable = false, unique = true)
+    @Column(name = "email", unique = true)
     private String email;
 
     @Column(name = "hash", nullable = false)
@@ -35,11 +36,14 @@ public class User {
     @Column(name = "username", nullable = false, unique = true)
     private String username;
 
-    @Column(name = "balance", nullable = false)
+    @Column(name = "balance")
     private Float balance;
 
     @Column(name = "status", nullable = false)
     @Enumerated(EnumType.STRING)
     private UserStatus status;
 
+    @Column(name = "role", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private RoleType role;
 }
