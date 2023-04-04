@@ -7,7 +7,7 @@ import com.example.sportsbook_application_backend.service.UserService;
 import com.google.gson.Gson;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
@@ -24,17 +24,14 @@ import org.springframework.web.util.ContentCachingRequestWrapper;
 import java.io.IOException;
 
 @Configuration
+@RequiredArgsConstructor
 public class AuthFilter {
-    private final AuthenticationManager manager;
-    @Autowired
-    private UserService userService;
-    @Autowired
-    private JwtService jwtService;
 
-    @Autowired
-    public AuthFilter(AuthenticationManager manager) {
-        this.manager = manager;
-    }
+    private final AuthenticationManager manager;
+    private final UserService userService;
+    private final JwtService jwtService;
+
+
 
     @Bean(name = "CustomAuthFilter")
     public AuthenticationFilter authFilter() {

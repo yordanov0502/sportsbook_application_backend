@@ -6,7 +6,7 @@ import com.example.sportsbook_application_backend.model.entity.Event;
 import com.example.sportsbook_application_backend.model.entity.League;
 import com.example.sportsbook_application_backend.model.enums.ResultType;
 import com.example.sportsbook_application_backend.repository.EventRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -16,20 +16,18 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
 @Service
+@RequiredArgsConstructor
 public class EventService {
+
     private final EventRepository eventRepository;
-    @Autowired
-    private LeagueService leagueService;
-    @Autowired
-    private RestTemplate restTemplate;
+    private final LeagueService leagueService;
+    private final RestTemplate restTemplate;
 
-    public EventService(EventRepository eventRepository) {
-        this.eventRepository = eventRepository;
-    }
 
-    public int callAPIForFixtures(String date){
+    public int callAPIForFixtures(
+             String date){
+
         int numberOfFixtures=0;
-
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         LocalDate parsedDate = LocalDate.parse(date, formatter);
 
@@ -57,8 +55,8 @@ public class EventService {
 
     public ArrayList<Event> getAllFixturesByDate(String date) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        LocalDate localDate = LocalDate.parse(date, formatter);
-        return eventRepository.getAllByDate(localDate);
+        LocalDate parsedDate = LocalDate.parse(date, formatter);
+        return eventRepository.getAllByDate(parsedDate);
     }
 
     public Event getFixtureById(Long id){return eventRepository.getById(id);}

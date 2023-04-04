@@ -12,26 +12,29 @@ import com.example.sportsbook_application_backend.model.enums.Outcome;
 import com.example.sportsbook_application_backend.model.enums.UserStatus;
 import com.example.sportsbook_application_backend.model.mapper.SlipMapper;
 import com.example.sportsbook_application_backend.repository.SlipRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Objects;
 
 @Service
+@RequiredArgsConstructor
 public class SlipService {
 
-    @Autowired
-    private SlipRepository slipRepository;
-    @Autowired
-    private UserService userService;
-    @Autowired
-    private BetService betService;
-    @Autowired
-    private SlipMapper slipMapper;
+    private final SlipRepository slipRepository;
+    private final UserService userService;
+    private final BetService betService;
+    private final SlipMapper slipMapper;
+
+    public void checkForExistingParams(Long userId, Long betId){
+        if(!userService.isUserExists(userId))
+            throw new NonexistentDataException("User with id:"+userId+", does NOT exist in the database.");
+
+        if(!betService.isBetExists(betId))
+            throw new NonexistentDataException("Bet with id:"+betId+", does NOT exist in the database.");
+    }
 
     public void resolveSlips(String  date){
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
@@ -61,14 +64,6 @@ public class SlipService {
                 userService.updateUser(user);
             }
         }
-    }
-
-    public void validateSlipParams(Long userId,Long betId,Float stake){
-        if(!userService.isUserExists(userId))
-            throw new NonexistentDataException("User with id:"+userId+", does NOT exist in the database.");
-
-        if(!betService.isBetExists(betId))
-            throw new NonexistentDataException("Bet with id:"+betId+", does NOT exist in the database.");
     }
 
 

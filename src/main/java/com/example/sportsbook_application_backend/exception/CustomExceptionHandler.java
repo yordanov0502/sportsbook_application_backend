@@ -1,5 +1,6 @@
 package com.example.sportsbook_application_backend.exception;
 
+import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -51,6 +52,11 @@ public class CustomExceptionHandler {
 
     @ExceptionHandler
     public ProblemDetail handleException(BadCredentialsException badCredentialsException){
-        return ProblemDetail.forStatusAndDetail(HttpStatus.FORBIDDEN, badCredentialsException.getMessage());
+        return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, badCredentialsException.getMessage());
+    }
+
+    @ExceptionHandler
+    public ProblemDetail handleException(ConstraintViolationException constraintViolationException){
+        return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, constraintViolationException.getMessage());
     }
 }

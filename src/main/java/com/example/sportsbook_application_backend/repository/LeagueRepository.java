@@ -9,4 +9,5 @@ public interface LeagueRepository extends JpaRepository<League, Long> {
     League getLeagueById(Long id);
     ArrayList<League> getAllByAllowed(boolean allowed);
     int countAllByAllowed(boolean allowed);
+    boolean existsLeagueById(Long id);
 }

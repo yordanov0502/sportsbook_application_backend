@@ -8,12 +8,14 @@ import com.example.sportsbook_application_backend.model.dto.user.UserRegistratio
 import com.example.sportsbook_application_backend.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/user")
 public class UserController {
 
@@ -21,11 +23,6 @@ public class UserController {
     private final UserMapper userMapper;
     private final JwtService jwtService;
 
-    public UserController(UserService userService, UserMapper userMapper, JwtService jwtService) {
-        this.userService = userService;
-        this.userMapper = userMapper;
-        this.jwtService = jwtService;
-    }
 
     @PostMapping("/registration")
     public UserDTO userRegistration(@RequestBody UserRegistrationDTO userRegistrationDTO, HttpServletResponse httpServletResponse){
