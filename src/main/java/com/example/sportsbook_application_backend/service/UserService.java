@@ -11,16 +11,11 @@ import com.example.sportsbook_application_backend.model.enums.Role;
 import com.example.sportsbook_application_backend.model.enums.UserStatus;
 import com.example.sportsbook_application_backend.repository.UserRepository;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -29,13 +24,10 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private final JwtService jwtService;
 
-
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtService jwtService) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
-        this.jwtService = jwtService;
     }
 
     public void updateUser(User user) {userRepository.save(user);}
@@ -193,7 +185,6 @@ public class UserService {
             throw new UpdateException("Error when creating user registration. Please try again.");
     }
 
-    /*
     public void checkUserCredentials(UserLoginDTO userLoginDTO){
         if(userRepository.existsUserByUsername(userLoginDTO.getUsername()))
         {
@@ -202,14 +193,6 @@ public class UserService {
                 throw new WrongCredentialsException("Wrong credentials!");
         }
         else {throw new WrongCredentialsException("Wrong credentials!");}
-    }*/
-
-
-    public Authentication validateUser(String username, String password) throws AuthenticationException {
-        Optional<User> user = userRepository.findByUsername(username);
-        if (user.isPresent() && passwordEncoder.matches(password, user.get().getPassword()))
-            return new UsernamePasswordAuthenticationToken(user.get().getUserId(), password, user.get().getAuthorities());
-        throw new BadCredentialsException("Invalid credentials");
     }
 
     public void editUser(UserDTO userDTO){
@@ -227,7 +210,7 @@ public class UserService {
         userRepository.save(user);
 
         if(!user.getPassword().equals(getUserById(userChangePasswordDTO.getId()).getPassword()))
-        throw new UpdateException("Unsuccessful password update. Please try again.");
+            throw new UpdateException("Unsuccessful password update. Please try again.");
     }
 
     public void validatePasswordChange(UserChangePasswordDTO userChangePasswordDTO)
