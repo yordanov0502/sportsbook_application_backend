@@ -1,9 +1,9 @@
 package com.example.sportsbook_application_backend.config;
 
+import com.example.sportsbook_application_backend.model.entity.User;
 import com.example.sportsbook_application_backend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
+
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -16,13 +16,12 @@ public class UserDetailsServiceConfig implements UserDetailsService {
 
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        final com.example.sportsbook_application_backend.model.entity.User profile = userRepository.findUserByUsername(username);
+    public User loadUserByUsername(String username) throws UsernameNotFoundException {
+        final User profile = userRepository.findUserByUserId(Long.valueOf(username));
         if (profile == null) {
             throw new UsernameNotFoundException(username);
         }
-        UserDetails user= User.withUsername(profile.getUsername()).password(profile.getPassword()).roles(profile.getRole().toString()).build();
-        return user;
+        return profile;
     }
 
 }

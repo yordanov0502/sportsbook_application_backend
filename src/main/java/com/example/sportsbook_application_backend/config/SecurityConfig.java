@@ -24,8 +24,8 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf().disable();
         http.authorizeHttpRequests().requestMatchers("/user/login","/user/registration","/error").permitAll();
-        http.authorizeHttpRequests().requestMatchers("/admin/**").hasRole(Role.ADMIN.toString());
-        http.authorizeHttpRequests().requestMatchers("/user/**").hasRole(Role.USER.toString());
+        http.authorizeHttpRequests().requestMatchers("/admin/**").hasAuthority(Role.ADMIN.toString());
+        http.authorizeHttpRequests().requestMatchers("/user/**").hasAuthority(Role.USER.toString());
         http.authenticationManager(applicationConfig.authenticationManager());
         http.addFilterAt(authenticationFilter, UsernamePasswordAuthenticationFilter.class);
         http.addFilterBefore(jwtAuthFilter,UsernamePasswordAuthenticationFilter.class);
