@@ -42,7 +42,7 @@ public class CustomExceptionHandler {
 
     @ExceptionHandler
     public ProblemDetail handleException(NonexistentDataException nonexistentDataException){
-        return ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, nonexistentDataException.getMessage());
+        return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, nonexistentDataException.getMessage());
     }
 
     @ExceptionHandler
@@ -52,7 +52,7 @@ public class CustomExceptionHandler {
 
     @ExceptionHandler
     public ProblemDetail handleException(BadCredentialsException badCredentialsException){
-        return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, badCredentialsException.getMessage());
+        return ProblemDetail.forStatusAndDetail(HttpStatus.UNAUTHORIZED, badCredentialsException.getMessage());
     }
 
     @ExceptionHandler

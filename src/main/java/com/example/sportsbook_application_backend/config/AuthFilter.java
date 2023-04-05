@@ -3,6 +3,7 @@ package com.example.sportsbook_application_backend.config;
 import com.example.sportsbook_application_backend.exception.FieldException;
 import com.example.sportsbook_application_backend.exception.WrongCredentialsException;
 import com.example.sportsbook_application_backend.model.dto.user.UserLoginDTO;
+import com.example.sportsbook_application_backend.model.entity.User;
 import com.example.sportsbook_application_backend.service.UserService;
 import com.google.gson.Gson;
 import jakarta.servlet.http.HttpServletRequest;
@@ -16,7 +17,8 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.context.SecurityContextHolder;
+
 import org.springframework.security.web.authentication.AuthenticationConverter;
 import org.springframework.security.web.authentication.AuthenticationFilter;
 import org.springframework.web.util.ContentCachingRequestWrapper;
@@ -47,8 +49,9 @@ public class AuthFilter {
     private void successHandler(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Authentication authentication) {
         if (authentication.isAuthenticated()) {
             User principal = (User) authentication.getPrincipal();
-            httpServletResponse.setHeader(HttpHeaders.AUTHORIZATION, "Bearer " + jwtService.generateToken(userService.getUserByUsername(principal.getUsername())));
+            httpServletResponse.setHeader(HttpHeaders.AUTHORIZATION, "Bearer " + jwtService.generateToken(userService.getUserById(principal.getUserId())));
             httpServletResponse.setStatus(HttpServletResponse.SC_OK);
+            SecurityContextHolder.getContext().setAuthentication(authentication);
         }
     }
 
@@ -67,10 +70,11 @@ public class AuthFilter {
         try {
             ContentCachingRequestWrapper requestWrapper = new ContentCachingRequestWrapper(request);
             Gson gson = new Gson();
-            UserLoginDTO user = gson.fromJson(requestWrapper.getReader(), UserLoginDTO.class);
-            userService.validateLoginFields(user);
-            userService.checkUserCredentials(user);
-            return new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword());
+            UserLoginDTO userDTO = gson.fromJson(requestWrapper.getReader(), UserLoginDTO.class);
+            userService.validateLoginFields(userDTO);
+            userService.checkUserCredentials(userDTO);
+            User user= userService.getUserByUsername(userDTO.getUsername());
+            return new UsernamePasswordAuthenticationToken(user.getUserId(), userDTO.getPassword());
         } catch (IOException e) {
             throw new WrongCredentialsException("Wrong credentials!");
         }
