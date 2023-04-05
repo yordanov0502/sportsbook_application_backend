@@ -7,7 +7,7 @@ import com.example.sportsbook_application_backend.model.entity.*;
 import com.example.sportsbook_application_backend.model.enums.Outcome;
 import com.example.sportsbook_application_backend.model.enums.ResultType;
 import com.example.sportsbook_application_backend.repository.BetRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -16,14 +16,12 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @Service
+@RequiredArgsConstructor
 public class BetService {
 
-    @Autowired
-    private BetRepository betRepository;
-    @Autowired
-    private EventService eventService;
-    @Autowired
-    private RestTemplate restTemplate;
+    private final BetRepository betRepository;
+    private final EventService eventService;
+    private final RestTemplate restTemplate;
 
     public int callAPIForOddsByDate(String date) {
         int numberOfFixtures=0;

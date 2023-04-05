@@ -1,6 +1,5 @@
 package com.example.sportsbook_application_backend.service;
 
-import com.example.sportsbook_application_backend.config.JwtService;
 import com.example.sportsbook_application_backend.exception.*;
 import com.example.sportsbook_application_backend.model.dto.user.UserChangePasswordDTO;
 import com.example.sportsbook_application_backend.model.dto.user.UserLoginDTO;
@@ -10,25 +9,24 @@ import com.example.sportsbook_application_backend.model.entity.User;
 import com.example.sportsbook_application_backend.model.enums.Role;
 import com.example.sportsbook_application_backend.model.enums.UserStatus;
 import com.example.sportsbook_application_backend.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Service
+@RequiredArgsConstructor
 public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
-        this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
-    }
 
     public void updateUser(User user) {userRepository.save(user);}
 
@@ -39,7 +37,7 @@ public class UserService {
     public ArrayList<User> getAllUsersByStatus(UserStatus status) {return userRepository.getAllByStatus(status);}
 
 
-    public static boolean validateName(String firstName) {
+    private boolean nameRegex(String firstName) {
         String regex = "^[A-Z]{1}([a-z]{2,20})$";
 
         Pattern p = Pattern.compile(regex);
@@ -51,7 +49,7 @@ public class UserService {
         }
     }
 
-    public static boolean validateEmail(String email) {
+    private boolean emailRegex(String email) {
         String regex = "^[\\w-\\.]{1,30}@([\\w-]{1,10}\\.)+[\\w-]{2,5}$";
 
         Pattern p = Pattern.compile(regex);
@@ -63,7 +61,7 @@ public class UserService {
         }
     }
 
-    public static boolean validateUsername(String username) {
+    private boolean usernameRegex(String username) {
         String regex = "[a-z0-9._]{4,20}$";
 
         Pattern p = Pattern.compile(regex);
@@ -75,7 +73,7 @@ public class UserService {
         }
     }
 
-    public boolean validatePassword(String password) {
+    private boolean passwordRegex(String password) {
         String regex = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=_*~!)(./:;<>?{}|`',-])(?=\\S+$).{7,30}$";
 
         Pattern p = Pattern.compile(regex);
@@ -93,20 +91,20 @@ public class UserService {
         if(Objects.equals(userRegistrationDTO.getFirstName(), "")||Objects.equals(userRegistrationDTO.getLastName(), "")||Objects.equals(userRegistrationDTO.getEmail(), "")||Objects.equals(userRegistrationDTO.getUsername(), "")||Objects.equals(userRegistrationDTO.getPassword(), ""))
             throw new FieldException("Please fill all fields.");
 
-        if(!validateName(userRegistrationDTO.getFirstName()))
+        if(!nameRegex(userRegistrationDTO.getFirstName()))
             throw new FieldException("The first name should have between 3 and 20 letters[a-z] starting with a capital letter.");
 
-        if(!validateName(userRegistrationDTO.getLastName()))
+        if(!nameRegex(userRegistrationDTO.getLastName()))
             throw new FieldException("The last name should have between 3 and 20 letters[a-z] starting with a capital letter.");
 
-        if(!validateEmail(userRegistrationDTO.getEmail()))
+        if(!emailRegex(userRegistrationDTO.getEmail()))
             throw new FieldException("The email should have between 6 and 47 symbols.");
 
-        if(!validateUsername(userRegistrationDTO.getUsername()))
+        if(!usernameRegex(userRegistrationDTO.getUsername()))
             throw new FieldException("The username should have between 4 and 20 symbols.{[a-z],[0-9],(_),(.)}");
 
-        if(!validatePassword(userRegistrationDTO.getPassword()))
-            throw new FieldException("The password should have between 7 and 30 symbols {[a-z],[0-9],[@#$%^&+=_*~!)(./:;<>?{}|`',-]}.\nOne capital, one small letter, one digit and one special symbol should be used at least once.");
+        if(!passwordRegex(userRegistrationDTO.getPassword()))
+            throw new FieldException("The password should have between 7 and 30 symbols {[a-z],[0-9],[@#$%^&+=_*~!)(./:;<>?{}|`',-]}. One capital, one small letter, one digit and one special symbol should be used at least once.");
 
         if(isEmailExists(userRegistrationDTO.getEmail()))
             throw new DuplicateEmailException("The email you entered already exists.");
@@ -120,10 +118,10 @@ public class UserService {
         if (Objects.equals(userLoginDTO.getUsername(), "") || Objects.equals(userLoginDTO.getPassword(), ""))
             throw new FieldException("Please fill all fields.");
 
-        if(!validateUsername(userLoginDTO.getUsername()))
+        if(!usernameRegex(userLoginDTO.getUsername()))
             throw new FieldException("The username should have between 4 and 20 symbols.{[a-z],[0-9],(_),(.)}");
 
-        if(!validatePassword(userLoginDTO.getPassword()))
+        if(!passwordRegex(userLoginDTO.getPassword()))
             throw new FieldException("The password should have between 7 and 30 symbols {[a-z],[0-9],[@#$%^&+=_*~!)(./:;<>?{}|`',-]}. One capital, one small letter, one digit and one special symbol should be used at least once.");
     }
 
@@ -134,16 +132,16 @@ public class UserService {
         if(Objects.equals(userDTO.getFirstName(), "")||Objects.equals(userDTO.getLastName(), "")||Objects.equals(userDTO.getEmail(), "")||Objects.equals(userDTO.getUsername(), ""))
             throw new FieldException("Please fill all fields.");
 
-        if(!validateName(userDTO.getFirstName()))
+        if(!nameRegex(userDTO.getFirstName()))
             throw new FieldException("The first name should have between 3 and 20 letters[a-z] starting with a capital letter.");
 
-        if(!validateName(userDTO.getLastName()))
+        if(!nameRegex(userDTO.getLastName()))
             throw new FieldException ("The last name should have between 3 and 20 letters[a-z] starting with a capital letter.");
 
-        if(!validateEmail(userDTO.getEmail()))
+        if(!emailRegex(userDTO.getEmail()))
             throw new FieldException ("The email should have between 6 and 47 symbols.");
 
-        if(!validateUsername(userDTO.getUsername()))
+        if(!usernameRegex(userDTO.getUsername()))
             throw new FieldException("The username should have between 4 and 20 symbols.{[a-z],[0-9],(_),(.)}");
 
         if(!user.getEmail().equals(userDTO.getEmail()) && isEmailExists(userDTO.getEmail()))
@@ -186,13 +184,9 @@ public class UserService {
     }
 
     public void checkUserCredentials(UserLoginDTO userLoginDTO){
-        if(userRepository.existsUserByUsername(userLoginDTO.getUsername()))
-        {
-            User user = userRepository.findUserByUsername(userLoginDTO.getUsername());
-            if(!passwordEncoder.matches(userLoginDTO.getPassword(), user.getPassword()))
-                throw new WrongCredentialsException("Wrong credentials!");
-        }
-        else {throw new WrongCredentialsException("Wrong credentials!");}
+        Optional<User> user = userRepository.findByUsername(userLoginDTO.getUsername());
+        if (!(user.isPresent() && passwordEncoder.matches(userLoginDTO.getPassword(), user.get().getPassword())))
+            throw new WrongCredentialsException("Wrong credentials!");
     }
 
     public void editUser(UserDTO userDTO){
@@ -221,6 +215,10 @@ public class UserService {
             throw new WrongCredentialsException("Wrong old password. Please provide a valid password.");
 
         if(passwordEncoder.matches(userChangePasswordDTO.getNewPassword(),user.getPassword()))
-            throw new DuplicatePasswordException("Please enter a password different from the old one.\"");
+            throw new DuplicatePasswordException("Please enter a password different from the old one.");
+
+        if(!passwordRegex(userChangePasswordDTO.getNewPassword()))
+            throw new FieldException("The password should have between 7 and 30 symbols {[a-z],[0-9],[@#$%^&+=_*~!)(./:;<>?{}|`',-]}. One capital, one small letter, one digit and one special symbol should be used at least once.");
+
     }
 }

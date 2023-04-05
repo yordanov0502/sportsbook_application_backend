@@ -1,11 +1,12 @@
 package com.example.sportsbook_application_backend.service;
 
+import com.example.sportsbook_application_backend.exception.NonexistentDataException;
 import com.example.sportsbook_application_backend.exception.UpdateException;
 import com.example.sportsbook_application_backend.model.dto.league.LeaguesDTO;
 import com.example.sportsbook_application_backend.model.dto.league.LeaguesResponseDTO;
 import com.example.sportsbook_application_backend.model.entity.League;
 import com.example.sportsbook_application_backend.repository.LeagueRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -13,14 +14,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class LeagueService {
-    @Autowired
-    private LeagueRepository leagueRepository;
-    @Autowired
-    private RestTemplate restTemplate;
+
+    private final LeagueRepository leagueRepository;
+    private final RestTemplate restTemplate;
 
     public League getLeagueById(Long id){
         return leagueRepository.getLeagueById(id);
+    }
+
+
+    public void checkForExistingLeagueId(Long leagueId){
+        if(!leagueRepository.existsLeagueById(leagueId))
+            throw new NonexistentDataException("League with id:"+leagueId+", does NOT exist in the database.");
     }
 
     public boolean checkIfLeagueIsAllowed(Long id){
