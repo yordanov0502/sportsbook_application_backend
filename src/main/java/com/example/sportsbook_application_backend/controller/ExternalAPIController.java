@@ -22,8 +22,8 @@ public class ExternalAPIController {
 
     @GetMapping("/getLeagues")
     public ResponseEntity<String> getLeagues(){
-        leagueService.callAPIForLeagues();
-        return new ResponseEntity<>("Leagues have been added to the database successfully.", HttpStatus.OK);
+        int numberOfLeagues = leagueService.callAPIForLeagues();
+        return new ResponseEntity<>(numberOfLeagues+" leagues have been added to the database successfully.", HttpStatus.OK);
     }
 
     @GetMapping("/getFixtures")

@@ -16,6 +16,7 @@ dependencies {
 
     implementation 'org.hibernate:hibernate-validator:6.0.10.Final'
     implementation 'com.auth0:java-jwt:4.2.1'
+    testImplementation 'junit:junit:4.13.1'
     runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
     runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
     implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
@@ -30,7 +31,9 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.security:spring-security-test'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.24.2'
     runtimeOnly 'org.postgresql:postgresql'
+    runtimeOnly 'com.h2database:h2'
 }
 
 tasks.named('test') {
