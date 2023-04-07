@@ -24,8 +24,7 @@ public class EventService {
     private final RestTemplate restTemplate;
 
 
-    public int callAPIForFixtures(
-             String date){
+    public int callAPIForFixtures(String date){
 
         int numberOfFixtures=0;
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
@@ -44,6 +43,8 @@ public class EventService {
                     event.setResult(ResultType.TWO);
                 else if (event.getStatus().contains("Match Finished"))
                     event.setResult(ResultType.ZERO);
+                else
+                    event.setResult(null);
 
                 eventRepository.save(event);
                 numberOfFixtures++;

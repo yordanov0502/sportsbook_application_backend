@@ -76,7 +76,7 @@ class LeagueServiceTest {
                 .isEqualTo("World cup");
         assertThat(found.getSeason())
                 .isNotEqualTo(2023);
-        assertThat(found.getSeason())
+        assertThat(found.getLeague())
                 .isNotEqualTo("League");
         found=leagueService.getLeagueById(2L);
         assertThat(found.getCountry())
