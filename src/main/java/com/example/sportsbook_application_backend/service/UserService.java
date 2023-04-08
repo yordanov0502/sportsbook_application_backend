@@ -37,7 +37,7 @@ public class UserService {
     public ArrayList<User> getAllUsersByStatus(UserStatus status) {return userRepository.getAllByStatus(status);}
 
 
-    private boolean nameRegex(String firstName) {
+    public boolean nameRegex(String firstName) {
         String regex = "^[A-Z]{1}([a-z]{2,20})$";
 
         Pattern p = Pattern.compile(regex);
@@ -49,7 +49,7 @@ public class UserService {
         }
     }
 
-    private boolean emailRegex(String email) {
+    public boolean emailRegex(String email) {
         String regex = "^[\\w-\\.]{1,30}@([\\w-]{1,10}\\.)+[\\w-]{2,5}$";
 
         Pattern p = Pattern.compile(regex);
@@ -61,7 +61,7 @@ public class UserService {
         }
     }
 
-    private boolean usernameRegex(String username) {
+    public boolean usernameRegex(String username) {
         String regex = "[a-z0-9._]{4,20}$";
 
         Pattern p = Pattern.compile(regex);
@@ -73,7 +73,7 @@ public class UserService {
         }
     }
 
-    private boolean passwordRegex(String password) {
+    public boolean passwordRegex(String password) {
         String regex = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=_*~!)(./:;<>?{}|`',-])(?=\\S+$).{7,30}$";
 
         Pattern p = Pattern.compile(regex);
@@ -98,7 +98,7 @@ public class UserService {
             throw new FieldException("The last name should have between 3 and 20 letters[a-z] starting with a capital letter.");
 
         if(!emailRegex(userRegistrationDTO.getEmail()))
-            throw new FieldException("The email should have between 6 and 47 symbols.");
+            throw new FieldException("The email should have between 6 and 47 symbols and consists of valid email domain.");
 
         if(!usernameRegex(userRegistrationDTO.getUsername()))
             throw new FieldException("The username should have between 4 and 20 symbols.{[a-z],[0-9],(_),(.)}");
@@ -139,7 +139,7 @@ public class UserService {
             throw new FieldException ("The last name should have between 3 and 20 letters[a-z] starting with a capital letter.");
 
         if(!emailRegex(userDTO.getEmail()))
-            throw new FieldException ("The email should have between 6 and 47 symbols.");
+            throw new FieldException ("The email should have between 6 and 47 symbols and consists of valid email domain.");
 
         if(!usernameRegex(userDTO.getUsername()))
             throw new FieldException("The username should have between 4 and 20 symbols.{[a-z],[0-9],(_),(.)}");
