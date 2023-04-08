@@ -7,7 +7,7 @@ import com.example.sportsbook_application_backend.model.entity.*;
 import com.example.sportsbook_application_backend.model.enums.Outcome;
 import com.example.sportsbook_application_backend.model.enums.ResultType;
 import com.example.sportsbook_application_backend.repository.BetRepository;
-import lombok.RequiredArgsConstructor;;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -24,7 +24,7 @@ public class BetService {
     private final RestTemplate restTemplate;
 
     public int callAPIForOddsByDate(String date) {
-        int numberOfFixtures=0;
+        int numberOfOdds=0;
 
         ArrayList<Event> events = eventService.getAllFixturesByDate(date);
 
@@ -57,38 +57,35 @@ public class BetService {
                         betRepository.save(betDraw);
                         betRepository.save(betAway);
 
-                        numberOfFixtures++;
+                        numberOfOdds+=3;
                     }
                 }
             }
         }
-        return numberOfFixtures;
+        return numberOfOdds;
     }
 
-    public void resolveBets(String  date){
+    public int resolveBets(String  date){
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        LocalDate localDate = LocalDate.parse(date, formatter);
+        LocalDate parsedDate = LocalDate.parse(date, formatter);
 
+        int resolvedBets=0;
         ArrayList<Bet> bets = betRepository.getBetByOutcome(Outcome.PENDING);
         for (Bet bet:bets) {
-            if (localDate.equals(bet.getEvent().getDate())) {
+            if (parsedDate.equals(bet.getEvent().getDate()) || parsedDate.isAfter(bet.getEvent().getDate())) {
                 if (bet.getType() == bet.getEvent().getResult()) {
                     bet.setOutcome(Outcome.WON);
                 } else {
                     bet.setOutcome(Outcome.LOST);
                 }
                 betRepository.save(bet);
+                resolvedBets++;
             }
         }
+        return resolvedBets;
     }
 
-    public boolean isBetExists(Long id){
-        return betRepository.existsById(id);
-    }
+    public boolean isBetExists(Long id){return betRepository.existsById(id);}
 
-    public Bet getBetById(Long id){
-        return betRepository.getBetById(id);
-    }
-
-
+    public Bet getBetById(Long id){return betRepository.getBetById(id);}
 }

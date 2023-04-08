@@ -39,8 +39,8 @@ public class ExternalAPIController {
 
     @GetMapping("/getOdds")
     public ResponseEntity<String> getOdds(@RequestParam @Pattern(regexp = "^\\d{4}\\-(0[1-9]|1[012])\\-(0[1-9]|[12][0-9]|3[01])$", message = "Invalid field parameter. The field should contain parameter of format [yyyy-MM-dd].") String date){
-        int numberOfFixtures = betService.callAPIForOddsByDate(date);
-        return new ResponseEntity<>("Odds have been added to "+numberOfFixtures+" fixtures.", HttpStatus.OK);
+        int numberOfOdds = betService.callAPIForOddsByDate(date);
+        return new ResponseEntity<>("Odds have been added to "+(numberOfOdds/3)+" fixtures.", HttpStatus.OK);
     }
 
 }
