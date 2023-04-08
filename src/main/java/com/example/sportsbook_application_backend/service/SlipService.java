@@ -76,7 +76,7 @@ public class SlipService {
             throw new UserStatusException("User with id:"+user.getUserId()+" cannot place a bet, because the account is frozen.(balance=0)");
 
         if(stake>user.getBalance())
-            throw new FieldException("Not enough balance. Wallet = "+user.getBalance()+"$.");
+            throw new FieldException("Not enough balance. Wallet = "+user.getBalance());
 
         Bet bet = betService.getBetById(betId);
         if(!bet.getOutcome().equals(Outcome.PENDING))
@@ -86,7 +86,7 @@ public class SlipService {
         int slipQuantityBefore= slipRepository.countAllByUser(user);
         Slip slip = new Slip(null,user,bet,stake,expectedProfit,Outcome.PENDING);
         slipRepository.save(slip);
-        int slipQuantityAfter = slipRepository.countAllByUser(user);
+        int slipQuantityAfter = slipRepository.countSlipsByUser(user);
 
         if(slipQuantityBefore!=slipQuantityAfter)//checks if new slip was added (relating certain user)
         {
