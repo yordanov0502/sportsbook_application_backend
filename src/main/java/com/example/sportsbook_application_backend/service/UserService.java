@@ -189,13 +189,14 @@ public class UserService {
             throw new WrongCredentialsException("Wrong credentials!");
     }
 
-    public void editUser(UserDTO userDTO){
+    public User editUser(UserDTO userDTO){
         User user=getUserById(userDTO.getId());
         user.setFirstName(userDTO.getFirstName());
         user.setLastName(userDTO.getLastName());
         user.setEmail(userDTO.getEmail());
         user.setUsername(userDTO.getUsername());
         userRepository.save(user);
+        return user;
     }
 
     public void changePassword(UserChangePasswordDTO userChangePasswordDTO){
@@ -211,14 +212,13 @@ public class UserService {
     {
         User user = getUserById(userChangePasswordDTO.getId());
 
+        if(!passwordRegex(userChangePasswordDTO.getOldPassword()) || !passwordRegex(userChangePasswordDTO.getNewPassword()))
+            throw new FieldException("The password should have between 7 and 30 symbols {[a-z],[0-9],[@#$%^&+=_*~!)(./:;<>?{}|`',-]}. One capital, one small letter, one digit and one special symbol should be used at least once.");
+
         if(!passwordEncoder.matches(userChangePasswordDTO.getOldPassword(), user.getPassword()))
             throw new WrongCredentialsException("Wrong old password. Please provide a valid password.");
 
         if(passwordEncoder.matches(userChangePasswordDTO.getNewPassword(),user.getPassword()))
             throw new DuplicatePasswordException("Please enter a password different from the old one.");
-
-        if(!passwordRegex(userChangePasswordDTO.getNewPassword()))
-            throw new FieldException("The password should have between 7 and 30 symbols {[a-z],[0-9],[@#$%^&+=_*~!)(./:;<>?{}|`',-]}. One capital, one small letter, one digit and one special symbol should be used at least once.");
-
     }
 }
