@@ -37,7 +37,7 @@ public class UserService {
     public ArrayList<User> getAllUsersByStatus(UserStatus status) {return userRepository.getAllByStatus(status);}
 
 
-    private boolean nameRegex(String firstName) {
+    public boolean nameRegex(String firstName) {
         String regex = "^[A-Z]{1}([a-z]{2,20})$";
 
         Pattern p = Pattern.compile(regex);
@@ -49,7 +49,7 @@ public class UserService {
         }
     }
 
-    private boolean emailRegex(String email) {
+    public boolean emailRegex(String email) {
         String regex = "^[\\w-\\.]{1,30}@([\\w-]{1,10}\\.)+[\\w-]{2,5}$";
 
         Pattern p = Pattern.compile(regex);
@@ -61,7 +61,7 @@ public class UserService {
         }
     }
 
-    private boolean usernameRegex(String username) {
+    public boolean usernameRegex(String username) {
         String regex = "[a-z0-9._]{4,20}$";
 
         Pattern p = Pattern.compile(regex);
@@ -73,7 +73,7 @@ public class UserService {
         }
     }
 
-    private boolean passwordRegex(String password) {
+    public boolean passwordRegex(String password) {
         String regex = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=_*~!)(./:;<>?{}|`',-])(?=\\S+$).{7,30}$";
 
         Pattern p = Pattern.compile(regex);
@@ -98,7 +98,7 @@ public class UserService {
             throw new FieldException("The last name should have between 3 and 20 letters[a-z] starting with a capital letter.");
 
         if(!emailRegex(userRegistrationDTO.getEmail()))
-            throw new FieldException("The email should have between 6 and 47 symbols.");
+            throw new FieldException("The email should have between 6 and 47 symbols and consists of valid email domain.");
 
         if(!usernameRegex(userRegistrationDTO.getUsername()))
             throw new FieldException("The username should have between 4 and 20 symbols.{[a-z],[0-9],(_),(.)}");
@@ -139,7 +139,7 @@ public class UserService {
             throw new FieldException ("The last name should have between 3 and 20 letters[a-z] starting with a capital letter.");
 
         if(!emailRegex(userDTO.getEmail()))
-            throw new FieldException ("The email should have between 6 and 47 symbols.");
+            throw new FieldException ("The email should have between 6 and 47 symbols and consists of valid email domain.");
 
         if(!usernameRegex(userDTO.getUsername()))
             throw new FieldException("The username should have between 4 and 20 symbols.{[a-z],[0-9],(_),(.)}");
@@ -189,13 +189,14 @@ public class UserService {
             throw new WrongCredentialsException("Wrong credentials!");
     }
 
-    public void editUser(UserDTO userDTO){
+    public User editUser(UserDTO userDTO){
         User user=getUserById(userDTO.getId());
         user.setFirstName(userDTO.getFirstName());
         user.setLastName(userDTO.getLastName());
         user.setEmail(userDTO.getEmail());
         user.setUsername(userDTO.getUsername());
         userRepository.save(user);
+        return user;
     }
 
     public void changePassword(UserChangePasswordDTO userChangePasswordDTO){
@@ -211,14 +212,13 @@ public class UserService {
     {
         User user = getUserById(userChangePasswordDTO.getId());
 
+        if(!passwordRegex(userChangePasswordDTO.getOldPassword()) || !passwordRegex(userChangePasswordDTO.getNewPassword()))
+            throw new FieldException("The password should have between 7 and 30 symbols {[a-z],[0-9],[@#$%^&+=_*~!)(./:;<>?{}|`',-]}. One capital, one small letter, one digit and one special symbol should be used at least once.");
+
         if(!passwordEncoder.matches(userChangePasswordDTO.getOldPassword(), user.getPassword()))
             throw new WrongCredentialsException("Wrong old password. Please provide a valid password.");
 
         if(passwordEncoder.matches(userChangePasswordDTO.getNewPassword(),user.getPassword()))
             throw new DuplicatePasswordException("Please enter a password different from the old one.");
-
-        if(!passwordRegex(userChangePasswordDTO.getNewPassword()))
-            throw new FieldException("The password should have between 7 and 30 symbols {[a-z],[0-9],[@#$%^&+=_*~!)(./:;<>?{}|`',-]}. One capital, one small letter, one digit and one special symbol should be used at least once.");
-
     }
 }
