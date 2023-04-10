@@ -1,7 +1,9 @@
 package com.example.sportsbook_application_backend.config;
 
+import com.example.sportsbook_application_backend.exception.FieldException;
 import com.example.sportsbook_application_backend.model.entity.User;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
@@ -48,21 +50,30 @@ public class JwtService {
         return (id==user.getUserId()) && !isTokenExpired(token);
     }
 
-    private boolean isTokenExpired(String token) {
-        return extractExpiration(token).before(new Date());
+    public boolean isTokenExpired(String token) {
+        if(extractExpiration(token)==null) {return true;}
+        else return false;
     }
 
     private Date extractExpiration(String token) {
-        return extractClaim(token,Claims::getExpiration);
+        try
+        {
+            return extractClaim(token,Claims::getExpiration);
+        }
+        catch (ExpiredJwtException e)
+        {
+            return null;
+        }
+
     }
 
     private Claims extractAllClaims(String token){
-        return Jwts
-                .parserBuilder()
-                .setSigningKey(getSignInKey())
-                .build()
-                .parseClaimsJws(token)
-                .getBody();
+            return Jwts
+                    .parserBuilder()
+                    .setSigningKey(getSignInKey())
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
     }
 
     private Key getSignInKey() {
