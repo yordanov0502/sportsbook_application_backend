@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.boot.web.client.RootUriTemplateHandler;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriTemplateHandler;
 
@@ -67,16 +66,15 @@ class CallExternalAPITest {
 
     void callAPIForFixtures() {
         LocalDate date=LocalDate.now();
-        LocalDate result;
         do {
-            result = date.plusDays(1);
-        } while ((result.getDayOfWeek() != DayOfWeek.SATURDAY && result.getDayOfWeek() != DayOfWeek.SUNDAY));
+            date = date.plusDays(1);
+        } while ((date.getDayOfWeek() != DayOfWeek.SATURDAY && date.getDayOfWeek() != DayOfWeek.SUNDAY));
 
-        int numberOfEventsAdded = eventService.callAPIForFixtures(result.toString());
+        int numberOfEventsAdded = eventService.callAPIForFixtures(date.toString());
         assertEquals(eventRepository.findAll().size(),numberOfEventsAdded);
 
-        numberOfEventsAdded = eventService.callAPIForFixtures(result.minusDays(7).toString());
-        assertEquals(eventRepository.getAllByDate(result.minusDays(7)).size(),numberOfEventsAdded);
+        numberOfEventsAdded = eventService.callAPIForFixtures(date.minusDays(7).toString());
+        assertEquals(eventRepository.getAllByDate(date.minusDays(7)).size(),numberOfEventsAdded);
     }
 
     @Test
