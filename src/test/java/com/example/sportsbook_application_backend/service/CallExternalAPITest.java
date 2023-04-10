@@ -2,6 +2,7 @@ package com.example.sportsbook_application_backend.service;
 
 import com.example.sportsbook_application_backend.exception.UpdateException;
 import com.example.sportsbook_application_backend.model.entity.League;
+import com.example.sportsbook_application_backend.repository.BetRepository;
 import com.example.sportsbook_application_backend.repository.EventRepository;
 import com.example.sportsbook_application_backend.repository.LeagueRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -27,8 +28,14 @@ class CallExternalAPITest {
     private LeagueRepository leagueRepository;
     @Autowired
     private EventRepository eventRepository;
+    @Autowired
+    private BetRepository betRepository;
     private LeagueService leagueService;
     private EventService eventService;
+    private BetService betService;
+    private LocalDate date;
+
+
 
     public RestTemplate restTemplate(RestTemplateBuilder builder){
         UriTemplateHandler uriTemplateHandler = new RootUriTemplateHandler("https://api-football-v1.p.rapidapi.com/v3/");
@@ -44,6 +51,8 @@ class CallExternalAPITest {
         RestTemplate restTemplate = restTemplate(new RestTemplateBuilder());
         leagueService = new LeagueService(leagueRepository, restTemplate);
         eventService = new EventService(eventRepository,leagueService,restTemplate);
+        betService = new BetService(betRepository,eventService,restTemplate);
+        date = LocalDate.now();
     }
 
     void callAPIForLeagues() {
@@ -65,23 +74,28 @@ class CallExternalAPITest {
     }
 
     void callAPIForFixtures() {
-        LocalDate date=LocalDate.now();
-        LocalDate result;
-        do {
-            result = date.plusDays(1);
-        } while ((result.getDayOfWeek() != DayOfWeek.SATURDAY && result.getDayOfWeek() != DayOfWeek.SUNDAY));
+        while((date.getDayOfWeek() != DayOfWeek.SATURDAY && date.getDayOfWeek() != DayOfWeek.SUNDAY))
+        {
+            date = date.plusDays(1);
+        }
 
-        int numberOfEventsAdded = eventService.callAPIForFixtures(result.toString());
+        int numberOfEventsAdded = eventService.callAPIForFixtures(date.toString());
         assertEquals(eventRepository.findAll().size(),numberOfEventsAdded);
 
-        numberOfEventsAdded = eventService.callAPIForFixtures(result.minusDays(7).toString());
-        assertEquals(eventRepository.getAllByDate(result.minusDays(7)).size(),numberOfEventsAdded);
+        numberOfEventsAdded = eventService.callAPIForFixtures(date.minusDays(7).toString());
+        assertEquals(eventRepository.getAllByDate(date.minusDays(7)).size(),numberOfEventsAdded);
+    }
+
+    void callAPIForOddsByDate(){
+        int numberOfOddsAdded = betService.callAPIForOddsByDate(date.toString());
+        assertEquals(betRepository.getAllBetsByDate(date).size(),numberOfOddsAdded);
     }
 
     @Test
     void callAPI(){
         callAPIForLeagues();
         callAPIForFixtures();
+        callAPIForOddsByDate();
     }
 
 }

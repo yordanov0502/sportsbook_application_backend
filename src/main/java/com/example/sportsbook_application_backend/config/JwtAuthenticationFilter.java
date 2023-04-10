@@ -1,5 +1,6 @@
 package com.example.sportsbook_application_backend.config;
 
+import com.example.sportsbook_application_backend.exception.FieldException;
 import com.example.sportsbook_application_backend.model.entity.User;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -40,15 +41,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         jwt = authHeader.substring(7);
-        id = jwtService.extractUsername(jwt);
-        if(id != null && SecurityContextHolder.getContext().getAuthentication() == null) //checks if a user is not authenticated
+        if(!jwtService.isTokenExpired(jwt))
         {
-            User user = userDetailsService.loadUserByUsername(id);
-            if(jwtService.isTokenValid(jwt,user))
+            id = jwtService.extractUsername(jwt);
+
+            if(id != null && SecurityContextHolder.getContext().getAuthentication() == null) //checks if a user is not authenticated
             {
-                UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(user,null,user.getAuthorities());
-                authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                SecurityContextHolder.getContext().setAuthentication(authToken);
+                User user = userDetailsService.loadUserByUsername(id);
+                if(jwtService.isTokenValid(jwt,user))
+                {
+                    UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(user,null,user.getAuthorities());
+                    authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                    SecurityContextHolder.getContext().setAuthentication(authToken);
+                }
             }
         }
         filterChain.doFilter(request, response);
