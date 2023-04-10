@@ -25,6 +25,7 @@ build:
     paths:
       - build
       - .gradle
+      - application-test.properties
 
 test:
   stage: test
