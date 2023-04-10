@@ -10,33 +10,15 @@
 # https://gradle.org/
 # https://github.com/gradle/gradle
 
-# Define the version of Gradle to use
 image: gradle:jdk19-alpine
 
-# Set up environment variables for Gradle
-variables:
-  GRADLE_USER_HOME: "/cache/.gradle"
+before_script:
+  - GRADLE_USER_HOME="$(pwd)/.gradle"
+  - export GRADLE_USER_HOME
 
-# Define the stages of the pipeline
-stages:
-  - build
-  - test
-  - deploy
-
-# Define the PostgreSQL service
-services:
-  - name: postgres:latest
-    alias: postgres
-    variables:
-      POSTGRES_DB: sportsbook
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: exit
-
-# Define the jobs for each stage
 build:
   stage: build
-  script:
-    - gradle --build-cache assemble
+  script: gradle --build-cache assemble
   cache:
     key: "$CI_COMMIT_REF_NAME"
     policy: push
@@ -46,18 +28,15 @@ build:
 
 test:
   stage: test
-  script:
-    - gradle check
+  script: gradle check
   cache:
     key: "$CI_COMMIT_REF_NAME"
     policy: pull
     paths:
       - build
-      - .gradle
+      - ./gradlew test
 
 deploy:
   stage: deploy
-  script:
-    - echo "Define your deployment script!"
-  environment:
-    name: production
+  script: echo "Define your deployment script!"
+  environment: production
