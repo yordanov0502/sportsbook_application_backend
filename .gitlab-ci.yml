@@ -34,7 +34,7 @@ test:
     policy: pull
     paths:
       - build
-      - .gradle
+      - ./gradlew test
 
 deploy:
   stage: deploy
