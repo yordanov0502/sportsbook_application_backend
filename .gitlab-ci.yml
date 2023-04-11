@@ -9,7 +9,7 @@ before_script:
 build:
   stage: build
   script:
-    $ docker pull postgres:14.3
+    docker pull postgres:14.3
   cache:
     key: "$CI_COMMIT_REF_NAME"
     policy: push
