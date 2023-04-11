@@ -33,17 +33,6 @@ before_script:
   - export GRADLE_USER_HOME
 
 build:
-  variables:
-    POSTGRES_DB: "sportsbook"
-    POSTGRES_USER: "postgres"
-    POSTGRES_PASSWORD: "exit"
-    PGDATA: "/var/lib/postgresql/data"
-    POSTGRES_INITDB_ARGS: "--encoding=UTF8 --data-checksums"
-  services:
-  - name: postgres:11.7
-    alias: db
-    entrypoint: ["docker-entrypoint.sh"]
-    command: ["postgres"]
   stage: build
   script: gradle --build-cache assemble
   cache:
@@ -54,6 +43,17 @@ build:
       - .gradle
 
 test:
+  variables:
+    POSTGRES_DB: sportsbook
+    POSTGRES_HOST: postgres
+    POSTGRES_PORT: 5432
+    POSTGRES_USER: postgres
+    POSTGRES_PASSWORD: exit
+  services:
+  - name: postgres:14.3
+    alias: db
+    entrypoint: ["docker-entrypoint.sh"]
+    command: ["postgres"]
   stage: test
   script: gradle check
   cache:
