@@ -6,6 +6,8 @@ before_script:
 
 build:
   stage: build
+  rules:
+    - if: $CI_COMMIT_BRANCH == 'main'
   script: gradle --build-cache assemble
   cache:
     key: "$CI_COMMIT_REF_NAME"
@@ -16,6 +18,8 @@ build:
 
 test:
   stage: test
+  rules:
+    - if: $CI_COMMIT_BRANCH == 'main'
   script: gradle check
   cache:
     key: "$CI_COMMIT_REF_NAME"
@@ -26,5 +30,7 @@ test:
 
 deploy:
   stage: deploy
+  rules:
+    - if: $CI_COMMIT_BRANCH == 'main'
   script: echo "Define your deployment script!"
   environment: production
