@@ -1,5 +1,6 @@
 image: gradle:jdk19-alpine
 
+
 before_script:
   - GRADLE_USER_HOME="$(pwd)/.gradle"
   - export GRADLE_USER_HOME
