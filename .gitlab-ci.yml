@@ -23,7 +23,7 @@ test:
     POSTGRES_PASSWORD: exit
     POSTGRES_HOST_AUTH_METHOD: trust
   stage: test
-  script: psql -U postgres -h localhost -d sportsbook -W
+  script: gradle check
   cache:
     key: "$CI_COMMIT_REF_NAME"
     policy: pull
