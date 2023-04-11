@@ -1,30 +1,4 @@
 
-password-auth:
-  services:
-    - postgres
-  variables:
-    # Configure postgres service (https://hub.docker.com/_/postgres/)
-    POSTGRES_DB: sportsbooks
-    POSTGRES_USER: postgres
-    POSTGRES_PASSWORD: exit
-  image: postgres
-  script:
-    # official way to provide password to psql: http://www.postgresql.org/docs/9.3/static/libpq-envars.html
-    - export PGPASSWORD=$POSTGRES_PASSWORD
-    - psql -h "postgres" -U "$POSTGRES_USER" -d "$POSTGRES_DB" -c "SELECT 'OK' AS status;"
-
-host-auth:
-  services:
-    - postgres
-  variables:
-    # Configure postgres service (https://hub.docker.com/_/postgres/)
-    POSTGRES_DB: sportsbooks
-    POSTGRES_USER: postgres
-    POSTGRES_HOST_AUTH_METHOD: trust
-  image: postgres
-  script:
-    - psql -h "postgres" -U "$POSTGRES_USER" -d "$POSTGRES_DB" -c "SELECT 'OK' AS status;"
-
 
 image: gradle:jdk19-alpine
 
@@ -34,7 +8,8 @@ before_script:
 
 build:
   stage: build
-  script: gradle --build-cache assemble
+  script:
+    $ docker pull postgres:14.2
   cache:
     key: "$CI_COMMIT_REF_NAME"
     policy: push
