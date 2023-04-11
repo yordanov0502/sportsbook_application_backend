@@ -43,17 +43,6 @@ build:
       - .gradle
 
 test:
-  variables:
-    HTTPS_PROXY: "https://postgres:5432"
-    HTTP_PROXY: "https://postgres:5432"
-    POSTGRES_DB: "sportsbook"
-    POSTGRES_USER: "postgres"
-    POSTGRES_PASSWORD: "exit"
-  services:
-  - name: postgres:14.3
-    alias: db
-    entrypoint: ["docker-entrypoint.sh"]
-    command: ["postgres"]
   stage: test
   script: gradle check
   cache:
