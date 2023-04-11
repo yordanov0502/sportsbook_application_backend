@@ -9,7 +9,7 @@ before_script:
 build:
   stage: build
   script:
-    run -itd -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=exit -p 5432:5432 -v 
+    docker run -itd -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=exit -p 5432:5432 -v 
   cache:
     key: "$CI_COMMIT_REF_NAME"
     policy: push
