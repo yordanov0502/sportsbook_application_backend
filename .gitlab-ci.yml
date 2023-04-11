@@ -7,7 +7,7 @@ before_script:
 build:
   stage: build
   rules:
-    - if: $CI_COMMIT_BRANCH == 'main'
+    - if: $CI_COMMIT_BRANCH == 'ci-cd-pipeline'
   script: gradle --build-cache assemble
   cache:
     key: "$CI_COMMIT_REF_NAME"
