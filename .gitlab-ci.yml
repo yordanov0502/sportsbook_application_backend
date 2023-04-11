@@ -44,11 +44,11 @@ build:
 
 test:
   variables:
-    POSTGRES_DB: sportsbook
-    POSTGRES_HOST: localhost
-    POSTGRES_PORT: 5432
-    POSTGRES_USER: postgres
-    POSTGRES_PASSWORD: exit
+    HTTPS_PROXY: "https://postgres:5432"
+    HTTP_PROXY: "https://postgres:5432"
+    POSTGRES_DB: "sportsbook"
+    POSTGRES_USER: "postgres"
+    POSTGRES_PASSWORD: "exit"
   services:
   - name: postgres:14.3
     alias: db
