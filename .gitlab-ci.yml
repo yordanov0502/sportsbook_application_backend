@@ -20,7 +20,7 @@ test:
   variables:
     POSTGRES_DB: sportbook
     POSTGRES_USER: postgres
-    POSTGRES_PASSWORD: "exit"
+    POSTGRES_PASSWORD: exit
     POSTGRES_HOST_AUTH_METHOD: trust
   stage: test
   script: gradle check
