@@ -4,7 +4,7 @@ password-auth:
     - postgres
   variables:
     # Configure postgres service (https://hub.docker.com/_/postgres/)
-    POSTGRES_DB: sportsbook
+    POSTGRES_DB: sportsbooks
     POSTGRES_USER: postgres
     POSTGRES_PASSWORD: exit
   image: postgres
@@ -18,7 +18,7 @@ host-auth:
     - postgres
   variables:
     # Configure postgres service (https://hub.docker.com/_/postgres/)
-    POSTGRES_DB: sportsbook
+    POSTGRES_DB: sportsbooks
     POSTGRES_USER: postgres
     POSTGRES_HOST_AUTH_METHOD: trust
   image: postgres
