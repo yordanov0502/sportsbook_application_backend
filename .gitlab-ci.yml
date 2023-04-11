@@ -6,19 +6,7 @@ before_script:
   - export GRADLE_USER_HOME
 
 build:
-  stage: build
-  script: gradle --build-cache assemble
-  cache:
-    key: "$CI_COMMIT_REF_NAME"
-    policy: push
-    paths:
-      - build
-      - .gradle
-
-test:
   variables:
-    HTTPS_PROXY: "https://localhost:5432"
-    HTTP_PROXY: "https://localhost:5432"
     POSTGRES_DB: "sportsbook"
     POSTGRES_USER: "postgres"
     POSTGRES_PASSWORD: "exit"
@@ -29,6 +17,16 @@ test:
     alias: db
     entrypoint: ["docker-entrypoint.sh"]
     command: ["postgres"]
+  stage: build
+  script: gradle --build-cache assemble
+  cache:
+    key: "$CI_COMMIT_REF_NAME"
+    policy: push
+    paths:
+      - build
+      - .gradle
+
+test:
   stage: test
   script: gradle check
   cache:
