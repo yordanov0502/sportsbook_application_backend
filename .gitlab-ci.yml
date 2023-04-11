@@ -1,6 +1,4 @@
-
-
-image: postgres:14.3
+image: gradle:jdk19-alpine
 
 before_script:
   - GRADLE_USER_HOME="$(pwd)/.gradle"
@@ -8,8 +6,7 @@ before_script:
 
 build:
   stage: build
-  script:
-    docker run -itd -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=exit -p 5432:5432 -v 
+  script: gradle --build-cache assemble
   cache:
     key: "$CI_COMMIT_REF_NAME"
     policy: push
@@ -18,6 +15,13 @@ build:
       - .gradle
 
 test:
+  services:
+  - postgres:14-alpine
+  variables:
+    POSTGRES_DB: sportbook
+    POSTGRES_USER: postgres
+    POSTGRES_PASSWORD: "exit"
+    POSTGRES_HOST_AUTH_METHOD: trust
   stage: test
   script: gradle check
   cache:
