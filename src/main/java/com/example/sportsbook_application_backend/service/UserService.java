@@ -125,9 +125,10 @@ public class UserService {
             throw new FieldException("The password should have between 7 and 30 symbols {[a-z],[0-9],[@#$%^&+=_*~!)(./:;<>?{}|`',-]}. One capital, one small letter, one digit and one special symbol should be used at least once.");
     }
 
-    public void validateEditFields(UserDTO userDTO) //validate fields in user edit info form
+    public void validateEditFields(User user,UserDTO userDTO) //validate fields in user edit info form
     {
-        User user = getUserById(userDTO.getId());
+        if(!user.getUserId().equals(userDTO.getId()))
+            throw new ProfileMismatchException("Access denied!");
 
         if(Objects.equals(userDTO.getFirstName(), "")||Objects.equals(userDTO.getLastName(), "")||Objects.equals(userDTO.getEmail(), "")||Objects.equals(userDTO.getUsername(), ""))
             throw new FieldException("Please fill all fields.");
@@ -189,8 +190,7 @@ public class UserService {
             throw new WrongCredentialsException("Wrong credentials!");
     }
 
-    public User editUser(UserDTO userDTO){
-        User user=getUserById(userDTO.getId());
+    public User editUser(User user,UserDTO userDTO){
         user.setFirstName(userDTO.getFirstName());
         user.setLastName(userDTO.getLastName());
         user.setEmail(userDTO.getEmail());
@@ -199,8 +199,7 @@ public class UserService {
         return user;
     }
 
-    public void changePassword(UserChangePasswordDTO userChangePasswordDTO){
-        User user=getUserById(userChangePasswordDTO.getId());
+    public void changePassword(User user,UserChangePasswordDTO userChangePasswordDTO){
         user.setPassword(passwordEncoder.encode(userChangePasswordDTO.getNewPassword()));
         userRepository.save(user);
 
@@ -208,9 +207,10 @@ public class UserService {
             throw new UpdateException("Unsuccessful password update. Please try again.");
     }
 
-    public void validatePasswordChange(UserChangePasswordDTO userChangePasswordDTO)
+    public void validatePasswordChange(User user,UserChangePasswordDTO userChangePasswordDTO)
     {
-        User user = getUserById(userChangePasswordDTO.getId());
+        if(!user.getUserId().equals(userChangePasswordDTO.getId()))
+            throw new ProfileMismatchException("Access denied!");
 
         if(!passwordRegex(userChangePasswordDTO.getOldPassword()) || !passwordRegex(userChangePasswordDTO.getNewPassword()))
             throw new FieldException("The password should have between 7 and 30 symbols {[a-z],[0-9],[@#$%^&+=_*~!)(./:;<>?{}|`',-]}. One capital, one small letter, one digit and one special symbol should be used at least once.");

@@ -70,11 +70,11 @@ public class AuthFilter {
         try {
             ContentCachingRequestWrapper requestWrapper = new ContentCachingRequestWrapper(request);
             Gson gson = new Gson();
-            UserLoginDTO userDTO = gson.fromJson(requestWrapper.getReader(), UserLoginDTO.class);
-            userService.validateLoginFields(userDTO);
-            userService.checkUserCredentials(userDTO);
-            User user= userService.getUserByUsername(userDTO.getUsername());
-            return new UsernamePasswordAuthenticationToken(user.getUserId(), userDTO.getPassword());
+            UserLoginDTO userLoginDTO = gson.fromJson(requestWrapper.getReader(), UserLoginDTO.class);
+            userService.validateLoginFields(userLoginDTO);
+            userService.checkUserCredentials(userLoginDTO);
+            User user= userService.getUserByUsername(userLoginDTO.getUsername());
+            return new UsernamePasswordAuthenticationToken(user.getUserId(), userLoginDTO.getPassword());
         } catch (IOException e) {
             throw new WrongCredentialsException("Wrong credentials!");
         }

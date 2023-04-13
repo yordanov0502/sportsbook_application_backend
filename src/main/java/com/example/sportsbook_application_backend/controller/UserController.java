@@ -32,24 +32,24 @@ public class UserController {
         return userMapper.mapToUserDTO(user);
     }
 
-    @GetMapping()
-    public UserDTO getProfile(@AuthenticationPrincipal User user){
+    @GetMapping("")
+    public UserDTO getAccount(@AuthenticationPrincipal User user){
         return userMapper.mapToUserDTO(user);
     }
 
-    @PostMapping("/edit/information")
-    public UserDTO editInformation(@RequestBody UserDTO userDTO) {
-        userService.validateEditFields(userDTO);
-        userService.editUser(userDTO);
+    @PutMapping("/edit/information")
+    public UserDTO editInformation(@AuthenticationPrincipal User user,@RequestBody UserDTO userDTO) {
+        userService.validateEditFields(user,userDTO);
+        userService.editUser(user,userDTO);
 
         return userMapper.mapToUserDTO(userService.getUserById(userDTO.getId()));
     }
 
-    @PostMapping("/edit/password")
-    public UserDTO changePassword(@RequestBody UserChangePasswordDTO userChangePasswordDTO)
+    @PutMapping("/edit/password")
+    public UserDTO changePassword(@AuthenticationPrincipal User user,@RequestBody UserChangePasswordDTO userChangePasswordDTO)
     {
-        userService.validatePasswordChange(userChangePasswordDTO);
-        userService.changePassword(userChangePasswordDTO);
+        userService.validatePasswordChange(user,userChangePasswordDTO);
+        userService.changePassword(user,userChangePasswordDTO);
         return userMapper.mapToUserDTO(userService.getUserById(userChangePasswordDTO.getId()));
     }
 }

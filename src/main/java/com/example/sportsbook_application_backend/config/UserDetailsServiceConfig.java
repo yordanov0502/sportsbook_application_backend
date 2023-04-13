@@ -16,10 +16,10 @@ public class UserDetailsServiceConfig implements UserDetailsService {
 
 
     @Override
-    public User loadUserByUsername(String username) throws UsernameNotFoundException {
-        final User profile = userRepository.findUserByUserId(Long.valueOf(username));
+    public User loadUserByUsername(String id) throws UsernameNotFoundException {
+        final User profile = userRepository.findUserByUserId(Long.valueOf(id));
         if (profile == null) {
-            throw new UsernameNotFoundException(username);
+            throw new UsernameNotFoundException(id);
         }
         return profile;
     }

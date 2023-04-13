@@ -21,8 +21,8 @@ public class JwtService {
 
     private static final String SECRET_KEY = "404E635266546A576E5A7234753778214125442A472D4B6150645367566B5870";
 
-    public String extractUsername(String token) {
-        return extractClaim(token,Claims::getSubject);//the subject should be the username of a certain user (or email)
+    public String extractId(String token) {
+        return extractClaim(token,Claims::getSubject);//the subject should be the username of a certain user (or email), but we use ID
     }
 
     public <T> T extractClaim(String token, Function<Claims,T> claimsResolver){
@@ -46,7 +46,7 @@ public class JwtService {
     }
 
     public boolean isTokenValid(String token,User user){
-        final long id = Long.parseLong(extractUsername(token));
+        final long id = Long.parseLong(extractId(token));
         return (id==user.getUserId()) && !isTokenExpired(token);
     }
 

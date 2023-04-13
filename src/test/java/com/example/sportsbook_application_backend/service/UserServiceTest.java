@@ -15,6 +15,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.jdbc.EmbeddedDatabaseConnection;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -221,53 +222,52 @@ class UserServiceTest {
     @Test
     void validateEditFields() {
         User user = new User(1L,"Georgi","Ivanov","gosho123@abv.bg","Az$um_GOSHO123","gosho123",200F, UserStatus.ACTIVE, Role.USER);
-        when(userRepository.findUserByUserId(1L)).thenReturn(user);
-        assertEquals(user,userService.getUserById(1L));
-        verify(userRepository,times(1)).findUserByUserId(1L);
-
-
         UserDTO userDTO = new UserDTO(null,"","","","",null);
-        FieldException fieldException = assertThrows(FieldException.class,() -> userService.validateEditFields(userDTO));
+
+        ProfileMismatchException profileMismatchException = assertThrows(ProfileMismatchException.class,() -> userService.validateEditFields(user,userDTO));
+        assertEquals("Access denied!",profileMismatchException.getMessage());
+        userDTO.setId(1L);
+
+        FieldException fieldException = assertThrows(FieldException.class,() -> userService.validateEditFields(user,userDTO));
         assertEquals("Please fill all fields.",fieldException.getMessage());
 
-        userDTO.setId(1L);
         userDTO.setFirstName("Георги");
         userDTO.setLastName("Ivanov");
         userDTO.setEmail("gosho123@abv.bg");
         userDTO.setUsername("gosho123");
-        fieldException = assertThrows(FieldException.class,() -> userService.validateEditFields(userDTO));
+        fieldException = assertThrows(FieldException.class,() -> userService.validateEditFields(user,userDTO));
         assertEquals("The first name should have between 3 and 20 letters[a-z] starting with a capital letter.",fieldException.getMessage());
 
         userDTO.setFirstName("Georgi");
         userDTO.setLastName("ivanov");
-        fieldException = assertThrows(FieldException.class,() -> userService.validateEditFields(userDTO));
+        fieldException = assertThrows(FieldException.class,() -> userService.validateEditFields(user,userDTO));
         assertEquals("The last name should have between 3 and 20 letters[a-z] starting with a capital letter.",fieldException.getMessage());
 
         userDTO.setLastName("Ivanov");
         userDTO.setEmail("gosho.gmail.com");
-        fieldException = assertThrows(FieldException.class,() -> userService.validateEditFields(userDTO));
+        fieldException = assertThrows(FieldException.class,() -> userService.validateEditFields(user,userDTO));
         assertEquals("The email should have between 6 and 47 symbols and consists of valid email domain.",fieldException.getMessage());
 
         userDTO.setEmail("gosho1234@abv.bg");
         userDTO.setUsername("gosho 01");
-        fieldException = assertThrows(FieldException.class,() -> userService.validateEditFields(userDTO));
+        fieldException = assertThrows(FieldException.class,() -> userService.validateEditFields(user,userDTO));
         assertEquals("The username should have between 4 and 20 symbols.{[a-z],[0-9],(_),(.)}",fieldException.getMessage());
         userDTO.setUsername("gosho1234");
 
 
         when(userRepository.existsUserByEmail("gosho1234@abv.bg")).thenReturn(true);
-        DuplicateEmailException duplicateEmailException = assertThrows(DuplicateEmailException.class,() -> userService.validateEditFields(userDTO));
+        DuplicateEmailException duplicateEmailException = assertThrows(DuplicateEmailException.class,() -> userService.validateEditFields(user,userDTO));
         assertEquals("The email you entered already exists.",duplicateEmailException.getMessage());
         when(userRepository.existsUserByEmail("gosho1234@abv.bg")).thenReturn(false);
         verify(userRepository,times(1)).existsUserByEmail("gosho1234@abv.bg");
 
         when(userRepository.existsUserByUsername("gosho1234")).thenReturn(true);
-        DuplicateUsernameException duplicateUsernameException = assertThrows(DuplicateUsernameException.class,() -> userService.validateEditFields(userDTO));
+        DuplicateUsernameException duplicateUsernameException = assertThrows(DuplicateUsernameException.class,() -> userService.validateEditFields(user,userDTO));
         assertEquals("The username you entered already exists.",duplicateUsernameException.getMessage());
         when(userRepository.existsUserByUsername("gosho1234")).thenReturn(false);
         verify(userRepository,times(1)).existsUserByUsername("gosho1234");
 
-        assertDoesNotThrow(() -> userService.validateEditFields(userDTO));
+        assertDoesNotThrow(() -> userService.validateEditFields(user,userDTO));
     }
 
     @Test
@@ -344,13 +344,7 @@ class UserServiceTest {
     void editUser() {
         User user = new User(1L,"Georgi","Ivanov","gosho123@abv.bg","Az$um_GOSHO123","gosho123",200F, UserStatus.ACTIVE, Role.USER);
         UserDTO userDTO = new UserDTO(1L,"Georgi","Georgiev","gosho123@abv.bg","Az$um_GOSHO123",200F);
-
-        when(userRepository.findUserByUserId(1L)).thenReturn(user);
-        assertEquals(user,userService.getUserById(1L));
-        verify(userRepository,times(1)).findUserByUserId(1L);
-
-        User user1 = userService.editUser(userDTO);
-
+        User user1 = userService.editUser(user,userDTO);
         assertEquals(user,user1);
     }
 
@@ -364,35 +358,37 @@ class UserServiceTest {
         mockedUser.setPassword(passwordEncoder.encode(userChangePasswordDTO.getNewPassword()));
 
         when(mockedUser.getPassword()).thenReturn("Az$um_GOSHO12345","Az$um_GOSHO123");
-        UpdateException updateException = assertThrows(UpdateException.class,() -> userService.changePassword(userChangePasswordDTO));
+        UpdateException updateException = assertThrows(UpdateException.class,() -> userService.changePassword(mockedUser,userChangePasswordDTO));
         assertEquals("Unsuccessful password update. Please try again.",updateException.getMessage());
 
         when(mockedUser.getPassword()).thenReturn("Az$um_GOSHO12345","Az$um_GOSHO12345");
-        assertDoesNotThrow(() -> userService.changePassword(userChangePasswordDTO));
+        assertDoesNotThrow(() -> userService.changePassword(mockedUser,userChangePasswordDTO));
     }
 
     @Test
     void validatePasswordChange() {
-        when(userRepository.findUserByUserId(1L)).thenReturn(mockedUser);
-        assertEquals(mockedUser,userService.getUserById(1L));
-        verify(userRepository,times(1)).findUserByUserId(1L);
+        User user = new User(2L,"Georgi","Ivanov","gosho123@abv.bg","Az$um_GOSHO1234","gosho123",200F, UserStatus.ACTIVE, Role.USER);
 
         UserChangePasswordDTO userChangePasswordDTO = new UserChangePasswordDTO(1L,"12345","12345");
-        FieldException fieldException = assertThrows(FieldException.class,() -> userService.validatePasswordChange(userChangePasswordDTO));
+        ProfileMismatchException profileMismatchException = assertThrows(ProfileMismatchException.class,() -> userService.validatePasswordChange(user,userChangePasswordDTO));
+        assertEquals("Access denied!",profileMismatchException.getMessage());
+
+        user.setUserId(1L);
+
+        FieldException fieldException = assertThrows(FieldException.class,() -> userService.validatePasswordChange(user,userChangePasswordDTO));
         assertEquals("The password should have between 7 and 30 symbols {[a-z],[0-9],[@#$%^&+=_*~!)(./:;<>?{}|`',-]}. One capital, one small letter, one digit and one special symbol should be used at least once.",fieldException.getMessage());
 
         userChangePasswordDTO.setOldPassword("Az$um_GOSHO123");
         userChangePasswordDTO.setNewPassword("Az$um_GOSHO1234");
-        when(mockedUser.getPassword()).thenReturn("Az$um_GOSHO1234");//it is not encoded, so even equal to oldPassword an exception will be thrown because passwordEncoder.matches() requires 2nd parameter to be encoded string
-        WrongCredentialsException wrongCredentialsException = assertThrows(WrongCredentialsException.class,() -> userService.validatePasswordChange(userChangePasswordDTO));
+        WrongCredentialsException wrongCredentialsException = assertThrows(WrongCredentialsException.class,() -> userService.validatePasswordChange(user,userChangePasswordDTO));
         assertEquals("Wrong old password. Please provide a valid password.",wrongCredentialsException.getMessage());
         userChangePasswordDTO.setOldPassword("Az$um_GOSHO1234");
-        when(passwordEncoder.matches(userChangePasswordDTO.getOldPassword(), mockedUser.getPassword())).thenReturn(true);
+        when(passwordEncoder.matches(userChangePasswordDTO.getOldPassword(), user.getPassword())).thenReturn(true);
 
-        DuplicatePasswordException duplicatePasswordException = assertThrows(DuplicatePasswordException.class,() -> userService.validatePasswordChange(userChangePasswordDTO));
+        DuplicatePasswordException duplicatePasswordException = assertThrows(DuplicatePasswordException.class,() -> userService.validatePasswordChange(user,userChangePasswordDTO));
         assertEquals("Please enter a password different from the old one.",duplicatePasswordException.getMessage());
 
         userChangePasswordDTO.setNewPassword("Az$um_GOSHO12345");
-        assertDoesNotThrow(() -> userService.validatePasswordChange(userChangePasswordDTO));
+        assertDoesNotThrow(() -> userService.validatePasswordChange(user,userChangePasswordDTO));
     }
 }
