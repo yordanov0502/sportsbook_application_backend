@@ -6,7 +6,6 @@ import lombok.*;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
 public class UserRegistrationDTO {
     private String firstName;
     private String lastName;

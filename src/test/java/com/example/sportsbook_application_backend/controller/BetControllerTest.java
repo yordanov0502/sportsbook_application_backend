@@ -11,7 +11,6 @@ import com.example.sportsbook_application_backend.model.enums.UserStatus;
 import com.example.sportsbook_application_backend.repository.*;
 import com.example.sportsbook_application_backend.service.BetService;
 import com.example.sportsbook_application_backend.service.EventService;
-import com.example.sportsbook_application_backend.service.LeagueService;
 import com.example.sportsbook_application_backend.service.SlipService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
