@@ -43,7 +43,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         jwt = authHeader.substring(7);
         if(!jwtService.isTokenExpired(jwt))
         {
-            id = jwtService.extractUsername(jwt);
+            id = jwtService.extractId(jwt);
 
             if(id != null && SecurityContextHolder.getContext().getAuthentication() == null) //checks if a user is not authenticated
             {

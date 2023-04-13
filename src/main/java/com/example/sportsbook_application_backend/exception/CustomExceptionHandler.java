@@ -59,4 +59,9 @@ public class CustomExceptionHandler {
     public ProblemDetail handleException(ConstraintViolationException constraintViolationException){
         return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, constraintViolationException.getMessage());
     }
+
+    @ExceptionHandler
+    public ProblemDetail handleException(ProfileMismatchException profileMismatchException){
+        return ProblemDetail.forStatusAndDetail(HttpStatus.FORBIDDEN, profileMismatchException.getMessage());
+    }
 }
