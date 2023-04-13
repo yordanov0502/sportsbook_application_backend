@@ -66,6 +66,7 @@ class UserServiceTest {
         when(userRepository.findUserByUsername("gosho123")).thenReturn(user);
         assertEquals(user,userService.getUserByUsername("gosho123"));
         verify(userRepository,times(1)).findUserByUsername("gosho123");
+        assertEquals(user.getRole(),userService.getUserByUsername("gosho123").getRole());
     }
 
     @Test
