@@ -43,10 +43,10 @@ class BetServiceTest {
     @Test
     void resolveBets() {
         League league = new League(1L, "Premier league", "England", "League", 2022, true);
-        Event event1 = new Event(1L,league, LocalDateTime.now().minusDays(3), LocalDate.now().minusDays(3),"Chelsea","Arsenal","Match Finished",ResultType.TWO);
-        Event event2 = new Event(2L,league, LocalDateTime.now().minusDays(3), LocalDate.now().minusDays(3),"Manchester United","Everton","Match Finished",ResultType.ONE);
-        Event event3 = new Event(3L,league, LocalDateTime.now().minusDays(3), LocalDate.now().minusDays(3),"Tottenham","Brighton","Match Finished",ResultType.ZERO);
-        Event event4 = new Event(4L,league, LocalDateTime.now().minusDays(3), LocalDate.now().minusDays(3),"Newcastle","Liverpool","Match Finished", ResultType.ONE);
+        Event event1 = new Event(1L,league, LocalDateTime.now(), LocalDate.now(),"Chelsea","Arsenal","Match Finished",ResultType.TWO);
+        Event event2 = new Event(2L,league, LocalDateTime.now(), LocalDate.now(),"Manchester United","Everton","Match Finished",ResultType.ONE);
+        Event event3 = new Event(3L,league, LocalDateTime.now(), LocalDate.now(),"Tottenham","Brighton","Match Finished",ResultType.ZERO);
+        Event event4 = new Event(4L,league, LocalDateTime.now(), LocalDate.now(),"Newcastle","Liverpool","Match Finished", ResultType.ONE);
 
         Event event5 = new Event(5L,league, LocalDateTime.now().plusDays(3), LocalDate.now().plusDays(3),"Manchester City","Fulham","Not Started",null);
 

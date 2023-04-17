@@ -72,7 +72,7 @@ public class BetService {
         int resolvedBets=0;
         ArrayList<Bet> bets = betRepository.getBetByOutcome(Outcome.PENDING);
         for (Bet bet:bets) {
-            if (parsedDate.equals(bet.getEvent().getDate()) || parsedDate.isAfter(bet.getEvent().getDate())) {
+            if (parsedDate.equals(bet.getEvent().getDate())) {
                 if (bet.getType() == bet.getEvent().getResult()) {
                     bet.setOutcome(Outcome.WON);
                 } else {
