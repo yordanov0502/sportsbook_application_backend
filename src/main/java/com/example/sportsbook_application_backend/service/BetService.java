@@ -73,13 +73,15 @@ public class BetService {
         ArrayList<Bet> bets = betRepository.getBetByOutcome(Outcome.PENDING);
         for (Bet bet:bets) {
             if (parsedDate.equals(bet.getEvent().getDate())) {
-                if (bet.getType() == bet.getEvent().getResult()) {
-                    bet.setOutcome(Outcome.WON);
-                } else {
-                    bet.setOutcome(Outcome.LOST);
+                if(Objects.equals(bet.getEvent().getStatus(), "Match Finished")) {
+                    if (bet.getType() == bet.getEvent().getResult()) {
+                        bet.setOutcome(Outcome.WON);
+                    } else {
+                        bet.setOutcome(Outcome.LOST);
+                    }
+                    betRepository.save(bet);
+                    resolvedBets++;
                 }
-                betRepository.save(bet);
-                resolvedBets++;
             }
         }
         return resolvedBets;

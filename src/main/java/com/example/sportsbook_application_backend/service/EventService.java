@@ -25,7 +25,6 @@ public class EventService {
 
 
     public int callAPIForFixtures(String date){
-
         int numberOfFixtures=0;
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         LocalDate parsedDate = LocalDate.parse(date, formatter);
@@ -41,7 +40,7 @@ public class EventService {
                     event.setResult(ResultType.ONE);
                 else if (eventDTO.getTeams().getAway().isWinner())
                     event.setResult(ResultType.TWO);
-                else if (event.getStatus().contains("Match Finished"))
+                else if (event.getStatus().contains("Match Finished")||event.getStatus().contains("First Half")||event.getStatus().contains("Second Half")||event.getStatus().contains("Halftime")||event.getStatus().contains("Extra Time"))
                     event.setResult(ResultType.ZERO);
                 else
                     event.setResult(null);

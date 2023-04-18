@@ -32,6 +32,7 @@ dependencies {
     testImplementation 'org.springframework.security:spring-security-test'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.24.2'
+    testImplementation 'org.awaitility:awaitility:4.2.0'
     runtimeOnly 'org.postgresql:postgresql'
     runtimeOnly 'com.h2database:h2'
 }
@@ -46,4 +47,9 @@ tasks.withType(Test) {
         events "started", "skipped", "passed", "failed"
         showStandardStreams true
     }
+}
+
+jar {
+    archiveBaseName = 'gs-gradle'
+    archiveVersion =  '0.1.0'
 }
