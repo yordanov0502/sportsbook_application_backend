@@ -121,7 +121,7 @@ class EventServiceTest {
         assertThat(found.getDate())
                 .isEqualTo(LocalDate.now());
         assertThat(found.getDateTime())
-                .isNotEqualTo(LocalDateTime.now());
+                .isNotEqualTo(LocalDateTime.now().plusMinutes(1));
         assertThat(found.getAwayTeam())
                 .isEqualTo("Everton");
         found=eventService.getFixtureById(4L);
