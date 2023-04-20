@@ -44,30 +44,22 @@ class BetServiceTest {
     void resolveBets() {
         League league = new League(1L, "Premier league", "England", "League", 2022, true);
         Event event1 = new Event(1L,league, LocalDateTime.now(), LocalDate.now(),"Chelsea","Arsenal","Match Finished",ResultType.TWO);
-        Event event2 = new Event(2L,league, LocalDateTime.now(), LocalDate.now(),"Manchester United","Everton","Match Finished",ResultType.ONE);
-        Event event3 = new Event(3L,league, LocalDateTime.now(), LocalDate.now(),"Tottenham","Brighton","Match Finished",ResultType.ZERO);
-        Event event4 = new Event(4L,league, LocalDateTime.now(), LocalDate.now(),"Newcastle","Liverpool","Match Finished", ResultType.ONE);
 
-        Event event5 = new Event(5L,league, LocalDateTime.now().plusDays(3), LocalDate.now().plusDays(3),"Manchester City","Fulham","Not Started",null);
+        Bet bet1 = new Bet(1L,event1, Outcome.PENDING, ResultType.ONE,3.45F);
+        Bet bet2 = new Bet(2L,event1, Outcome.PENDING, ResultType.TWO,2.05F);
+        Bet bet3 = new Bet(3L,event1, Outcome.PENDING, ResultType.ZERO,5.13F);
 
-        Bet bet1 = new Bet(1L,event1, Outcome.PENDING, ResultType.TWO,3.45F);
-        Bet bet2 = new Bet(2L,event2, Outcome.PENDING, ResultType.TWO,2.05F);
-        Bet bet3 = new Bet(3L,event3, Outcome.PENDING, ResultType.TWO,5.13F);
-        Bet bet4 = new Bet(4L,event4, Outcome.PENDING, ResultType.TWO,1.23F);
+        ArrayList<Bet> pendingBets = new ArrayList<>(Arrays.asList(bet1,bet2,bet3));
+        when(betRepository.getBetByOutcomeAndEvent(Outcome.PENDING,event1)).thenReturn(pendingBets);
+        assertEquals(pendingBets.size(),betRepository.getBetByOutcomeAndEvent(Outcome.PENDING,event1).size());
+        verify(betRepository,times(1)).getBetByOutcomeAndEvent(Outcome.PENDING,event1);
 
-        Bet bet5 = new Bet(5L,event5, Outcome.PENDING, ResultType.TWO,2.85F);
-
-        ArrayList<Bet> pendingBets = new ArrayList<>(Arrays.asList(bet1,bet2,bet3,bet4,bet5));
-        when(betRepository.getBetByOutcome(Outcome.PENDING)).thenReturn(pendingBets);
-        assertEquals(pendingBets.size(),betRepository.getBetByOutcome(Outcome.PENDING).size());
-        verify(betRepository,times(1)).getBetByOutcome(Outcome.PENDING);
-
-        assertEquals(4,betService.resolveBets(LocalDate.now().toString()));
+        assertEquals(3,betService.resolveBets(event1));
 
         when(betRepository.getBetById(1L)).thenReturn(bet1);
-        assertEquals(betRepository.getBetById(1L).getOutcome(),Outcome.WON);
+        assertEquals(betRepository.getBetById(1L).getOutcome(),Outcome.LOST);
         when(betRepository.getBetById(2L)).thenReturn(bet2);
-        assertEquals(betRepository.getBetById(2L).getOutcome(),Outcome.LOST);
+        assertEquals(betRepository.getBetById(2L).getOutcome(),Outcome.WON);
     }
 
     @Test

@@ -13,7 +13,11 @@ import com.example.sportsbook_application_backend.model.enums.UserStatus;
 import com.example.sportsbook_application_backend.model.mapper.SlipMapper;
 import com.example.sportsbook_application_backend.repository.SlipRepository;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -23,6 +27,7 @@ import java.util.ArrayList;
 @RequiredArgsConstructor
 public class SlipService {
 
+    Logger logger = LoggerFactory.getLogger(SlipService.class);
     private final SlipRepository slipRepository;
     private final UserService userService;
     private final BetService betService;
@@ -36,18 +41,17 @@ public class SlipService {
             throw new NonexistentDataException("Bet with id:"+betId+", does NOT exist in the database.");
     }
 
-    public void resolveSlips(String  date){
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        LocalDate localDate = LocalDate.parse(date, formatter);
+    @Transactional(propagation= Propagation.REQUIRES_NEW) //it means a new transaction will be created
+    public void resolveSlips(){
+        logger.info("Method resolveSlips is INVOKED.");
 
         ArrayList<User> users = userService.getAllUsersByStatus(UserStatus.ACTIVE);
+
         for(User user:users)
         {
-           ArrayList<Slip> slipsOfUser = slipRepository.getAllByUserAndOutcome(user,Outcome.PENDING);
+           ArrayList<Slip> slipsOfUser = slipRepository.getAllByUserAndOutcomeAndBetOutcome(user,Outcome.PENDING);
            for(Slip slip:slipsOfUser)
            {
-               if(slip.getBet().getEvent().getDate().equals(localDate))
-               {
                    slip.setOutcome(slip.getBet().getOutcome());
                    slipRepository.save(slip);
                    if(slip.getOutcome().equals(Outcome.WON))
@@ -55,7 +59,6 @@ public class SlipService {
                        user.setBalance(user.getBalance()+(slip.getStake()*slip.getBet().getOdd()));
                        userService.updateUser(user);
                    }
-               }
            }
            //if a user has no slips with status PENDING and has 0$ balance, then his account becomes FROZEN and no longer can place bets(slips)
             if(slipRepository.getAllByUserAndOutcome(user,Outcome.PENDING).isEmpty() && user.getBalance()==0)

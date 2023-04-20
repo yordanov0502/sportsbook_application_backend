@@ -1,6 +1,7 @@
 package com.example.sportsbook_application_backend.model.entity;
 
 import com.example.sportsbook_application_backend.model.enums.ResultType;
+import com.example.sportsbook_application_backend.model.listener.EventListener;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -18,6 +19,7 @@ import java.time.LocalDateTime;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@EntityListeners(EventListener.class)
 public class Event {
     @Id
     @Column(name = "id_event", nullable = false)

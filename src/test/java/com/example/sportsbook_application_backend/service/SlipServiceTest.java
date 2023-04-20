@@ -132,7 +132,7 @@ class SlipServiceTest {
 
     @Test
     void resolveSlips() {
-        assertThatNoException().isThrownBy(()->slipService.resolveSlips(LocalDate.now().toString()));
+        assertThatNoException().isThrownBy(()->slipService.resolveSlips());
     }
 
     @Test

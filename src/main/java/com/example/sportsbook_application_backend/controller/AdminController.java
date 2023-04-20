@@ -31,8 +31,6 @@ public class AdminController {
     @PostMapping("/simulate")
     public ResponseEntity<String> simulateFixtures(@RequestParam @Pattern(regexp = "^\\d{4}\\-(0[1-9]|1[012])\\-(0[1-9]|[12][0-9]|3[01])$", message = "Invalid field parameter. The field should contain parameter of format [yyyy-MM-dd].") String date){
         int numberOfFixtures = eventService.simulateFixturesByDate(date);
-        betService.resolveBets(date);
-        slipService.resolveSlips(date);
         return new ResponseEntity<>(numberOfFixtures+ " fixtures for date: "+date+" have been simulated successfully.", HttpStatus.OK);
     }
 

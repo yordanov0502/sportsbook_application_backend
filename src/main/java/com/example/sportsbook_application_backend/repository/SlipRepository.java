@@ -10,6 +10,11 @@ import org.springframework.data.repository.query.Param;
 import java.util.ArrayList;
 public interface SlipRepository extends JpaRepository<Slip, Long> {
     ArrayList<Slip> getAllByUserAndOutcome(User user, Outcome outcome);
+
+    //get slips of user, which have certain outcome(PENDING) and which slips have certain bet outcome!=PENDING
+    @Query("Select s from Slip s where s.user = :user and s.outcome = :outcome and s.bet.outcome not like \"PENDING\"")
+    ArrayList<Slip> getAllByUserAndOutcomeAndBetOutcome(@Param("user")User user, @Param("outcome")Outcome outcome);
+
     int countAllByUser(User user);
     int countSlipsByUser(User user);
 

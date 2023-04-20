@@ -147,8 +147,8 @@ class BetControllerTest {
         assertEquals(200,placeBet.getResponse().getStatus());
         assertEquals(placeBet.getResponse().getContentAsString(),"A slip was created successfully.");
         eventService.simulateFixturesByDate(LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
-        betService.resolveBets(LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
-        slipService.resolveSlips(LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+        betService.resolveBets(eventRepository.getById(1L));
+        slipService.resolveSlips();
 
         MvcResult getBetHistory2=mvc.perform(get("/user/bet/getBetHistory")
                         .contentType(MediaType.APPLICATION_JSON)
