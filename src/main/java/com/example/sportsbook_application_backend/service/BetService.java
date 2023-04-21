@@ -78,7 +78,7 @@ public class BetService {
 
         for (Bet bet:bets)
         {
-            if (bet.getType() == bet.getEvent().getResult())
+            if (bet.getType() == event.getResult())
             {
                 bet.setOutcome(Outcome.WON);
             }
