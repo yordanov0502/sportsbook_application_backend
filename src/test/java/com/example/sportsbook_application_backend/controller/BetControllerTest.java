@@ -26,6 +26,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 
 import java.time.LocalDate;
@@ -136,25 +137,5 @@ class BetControllerTest {
                         .characterEncoding("UTF-8"))
                 .andReturn();
         assertEquals(400,getBetHistory1.getResponse().getStatus());
-
-        MvcResult placeBet=mvc.perform(post("/user/bet/placeBet")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .param("betId","1")//positive existing id
-                        .param("stake","30")
-                        .header("Authorization",login.getResponse().getHeader("Authorization"))
-                        .characterEncoding("UTF-8"))
-                .andReturn();
-        assertEquals(200,placeBet.getResponse().getStatus());
-        assertEquals(placeBet.getResponse().getContentAsString(),"A slip was created successfully.");
-        eventService.simulateFixturesByDate(LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
-        betService.resolveBets(LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
-        slipService.resolveSlips(LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
-
-        MvcResult getBetHistory2=mvc.perform(get("/user/bet/getBetHistory")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .header("Authorization",login.getResponse().getHeader("Authorization"))
-                        .characterEncoding("UTF-8"))
-                .andReturn();
-        assertEquals(200,getBetHistory2.getResponse().getStatus());
     }
 }

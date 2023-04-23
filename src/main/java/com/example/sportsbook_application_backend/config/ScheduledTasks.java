@@ -20,8 +20,6 @@ public class ScheduledTasks {
 	@Scheduled(cron = "10 */5 * * * *")
 	public void getFixtures() {
 		eventService.callAPIForFixtures(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
-		betService.resolveBets(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
-		slipService.resolveSlips(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
 	}
 
 	@Scheduled(cron = "0 2 0 * * *")
@@ -32,7 +30,5 @@ public class ScheduledTasks {
 	@Scheduled(cron = "0 2 2 * * *")
 	public void getFixturesByPreviousDay() {
 		eventService.callAPIForFixtures(LocalDateTime.now().minusDays(1).format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
-		betService.resolveBets(LocalDateTime.now().minusDays(1).format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
-		slipService.resolveSlips(LocalDateTime.now().minusDays(1).format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
 	}
 }

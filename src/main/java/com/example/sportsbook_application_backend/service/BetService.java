@@ -8,17 +8,21 @@ import com.example.sportsbook_application_backend.model.enums.Outcome;
 import com.example.sportsbook_application_backend.model.enums.ResultType;
 import com.example.sportsbook_application_backend.repository.BetRepository;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @Service
 @RequiredArgsConstructor
+
 public class BetService {
 
+    Logger logger = LoggerFactory.getLogger(BetService.class);
     private final BetRepository betRepository;
     private final EventService eventService;
     private final RestTemplate restTemplate;
@@ -65,24 +69,25 @@ public class BetService {
         return numberOfOdds;
     }
 
-    public int resolveBets(String  date){
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        LocalDate parsedDate = LocalDate.parse(date, formatter);
+    @Transactional(propagation= Propagation.REQUIRES_NEW) //it means a new transaction will be created
+    public int resolveBets(Event event){
+        logger.info("Method resolve bets in INVOKED.");
 
         int resolvedBets=0;
-        ArrayList<Bet> bets = betRepository.getBetByOutcome(Outcome.PENDING);
-        for (Bet bet:bets) {
-            if (parsedDate.equals(bet.getEvent().getDate())) {
-                if(Objects.equals(bet.getEvent().getStatus(), "Match Finished")) {
-                    if (bet.getType() == bet.getEvent().getResult()) {
-                        bet.setOutcome(Outcome.WON);
-                    } else {
-                        bet.setOutcome(Outcome.LOST);
-                    }
-                    betRepository.save(bet);
-                    resolvedBets++;
-                }
+        ArrayList<Bet> bets = betRepository.getBetByOutcomeAndEvent(Outcome.PENDING,event);
+
+        for (Bet bet:bets)
+        {
+            if (bet.getType() == event.getResult())
+            {
+                bet.setOutcome(Outcome.WON);
             }
+            else
+            {
+                bet.setOutcome(Outcome.LOST);
+            }
+            betRepository.save(bet);
+            resolvedBets++;
         }
         return resolvedBets;
     }

@@ -41,7 +41,7 @@ class CallExternalAPITest {
         UriTemplateHandler uriTemplateHandler = new RootUriTemplateHandler("https://api-football-v1.p.rapidapi.com/v3/");
         return builder
                 .uriTemplateHandler(uriTemplateHandler)
-                .defaultHeader("X-RapidAPI-Key","7c6673cc3fmsh774315cfbb398dcp16717bjsn652b51eaa340")
+                .defaultHeader("X-RapidAPI-Key","6e113cdd7dmsha58c67d494ccc13p19c311jsn1a974ed0bd51")
                 .defaultHeader("X-RapidAPI-Host","api-football-v1.p.rapidapi.com")
                 .build();
     }
