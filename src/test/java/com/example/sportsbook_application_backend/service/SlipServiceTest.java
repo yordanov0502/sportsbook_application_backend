@@ -16,7 +16,6 @@ import com.example.sportsbook_application_backend.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.jdbc.EmbeddedDatabaseConnection;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -31,6 +30,8 @@ import java.util.ArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.when;
+
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.ANY, connection = EmbeddedDatabaseConnection.H2)
@@ -43,9 +44,16 @@ class SlipServiceTest {
     private BetRepository betRepository;
     @Autowired
     private SlipService slipService;
+    @Autowired
+    private UserService userService;
+    @Autowired
+    private BetService betService;
 
     @BeforeEach
     public void setUp() {
+        slipService.evictHistory();
+        betService.evictAllCaches();
+        userService.evictAllCache();
         User user = new User(1L,"Ivan","Popov","ivan55@abv.bg","1234","ivcho",200F, UserStatus.ACTIVE, Role.USER);
         User user2 = new User(2L,"Ivan","Popov","ivan55@abv.bg","1234","ivcho",200F, UserStatus.ACTIVE, Role.USER);
         User user3 = new User(3L,"Ivan","Popov","ivan55@abv.bg","1234","ivcho",200F, UserStatus.FROZEN, Role.USER);
@@ -74,9 +82,9 @@ class SlipServiceTest {
         slips.add(slip3);
 
         for(User user1:users) {
-            Mockito.when(userRepository.existsById(user1.getUserId()))
+            when(userRepository.existsById(user1.getUserId()))
                     .thenReturn(true);
-            Mockito.when(userRepository.findUserByUserId(user1.getUserId()))
+            when(userRepository.findUserByUserId(user1.getUserId()))
                     .thenReturn(user1);
             ArrayList<Slip> expiredSlips=new ArrayList<>();
             ArrayList<Slip> userSlips=new ArrayList<>();
@@ -90,18 +98,20 @@ class SlipServiceTest {
                     userSlips.add(slip1);
                 }
             }
-            Mockito.when(slipRepository.getExpiredBetsOfUser(user1))
+            when(slipRepository.getExpiredBetsOfUser(user1))
                     .thenReturn(expiredSlips);
-            Mockito.when(slipRepository.countAllByUser(user1))
+            when(slipRepository.countAllByUser(user1))
                     .thenReturn(userSlips.size());
-            Mockito.when(slipRepository.getAllByUserAndOutcome(user1,Outcome.PENDING))
+            when(slipRepository.getAllByUserAndOutcome(user1,Outcome.PENDING))
                     .thenReturn(pendingSlips);
+            when(slipRepository.getAllByUserAndOutcomeAndBetOutcome(user1,Outcome.PENDING)).thenReturn(pendingSlips);
+
             if(user1.getUserId()==4) {
-                Mockito.when(slipRepository.countSlipsByUser(user1))
+                when(slipRepository.countSlipsByUser(user1))
                         .thenReturn(userSlips.size());
             }
             else {
-                Mockito.when(slipRepository.countSlipsByUser(user1))
+                when(slipRepository.countSlipsByUser(user1))
                         .thenReturn(userSlips.size()+1);
             }
         }
@@ -110,13 +120,13 @@ class SlipServiceTest {
         bets.add(bet);
         bets.add(bet2);
         for (Bet bet1 : bets) {
-            Mockito.when(betRepository.existsById(bet1.getId()))
+            when(betRepository.existsById(bet1.getId()))
                     .thenReturn(true);
-            Mockito.when(betRepository.getBetById(bet1.getId()))
+            when(betRepository.getBetById(bet1.getId()))
                     .thenReturn(bet1);
         }
 
-        Mockito.when(userRepository.getAllByStatus(UserStatus.ACTIVE))
+        when(userRepository.getAllByStatus(UserStatus.ACTIVE))
                 .thenReturn(users);
     }
 

@@ -21,6 +21,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.junit.jupiter.api.Assertions.*;
+
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.ANY, connection = EmbeddedDatabaseConnection.H2)
@@ -33,11 +34,14 @@ class LeagueServiceTest {
 
     @BeforeEach
     public void setUp() {
+        leagueService.evictAllCaches();
+
         League league = new League(1L, "World cup", "World", "Cup", 2022, true);
         League league2 = new League(2L, "Premier league", "England", "League", 2022, true);
         League league3 = new League(3L, "FA cup", "England", "Cup", 2022, true);
         League league4 = new League(4L, "Purva liga", "Serbia", "League", 2022, false);
         League league5 = new League(5L, "Vtora liga", "Serbia", "League", 2022, false);
+        League league6 = new League(6L, "Vtora liga", "Serbia", "League", 2022, false);
 
         ArrayList<League> leagues = new ArrayList<>();
         leagues.add(league);
@@ -45,6 +49,7 @@ class LeagueServiceTest {
         leagues.add(league3);
         leagues.add(league4);
         leagues.add(league5);
+        leagues.add(league6);
 
         for (League leagueTest : leagues) {
            Mockito.when(leagueRepository.getLeagueById(leagueTest.getId()))
@@ -64,8 +69,13 @@ class LeagueServiceTest {
                 allowedLeagues.add(league1);
         }
 
+        ArrayList<League> leagues2=new ArrayList<>();
+        for(int i=1;i<=28;i++){
+            leagues2.add(new League());
+        }
+
         Mockito.when(leagueRepository.getAllByAllowed(true))
-                .thenReturn(allowedLeagues);
+                .thenReturn(allowedLeagues,allowedLeagues,leagues2);
 
         Mockito.when(leagueRepository.findAll())
                 .thenReturn(leagues);
@@ -97,12 +107,15 @@ class LeagueServiceTest {
 
     @Test
     void checkForExistingLeagueId() {
-        assertThrowsExactly(NonexistentDataException.class,()->leagueService.checkForExistingLeagueId(6L));
+        assertThrowsExactly(NonexistentDataException.class,()->leagueService.checkForExistingLeagueId(7L));
         assertThatNoException().isThrownBy(()->leagueService.checkForExistingLeagueId(1L));
     }
 
     @Test
     void allowLeague() {
+        UpdateException exception = assertThrowsExactly(UpdateException.class, () -> leagueService.allowLeague(2L));
+        assertEquals(exception.getMessage(),"The league is already allowed");
+
         assertThatNoException().isThrownBy(()->leagueService.allowLeague(4L));
         String found=leagueService.allowLeague(5L);
         assertThat(found)
@@ -110,15 +123,8 @@ class LeagueServiceTest {
         assertThat(found)
                 .isNotEqualTo("World cup");
 
-        UpdateException exception = assertThrowsExactly(UpdateException.class, () -> leagueService.allowLeague(2L));
-        assertEquals(exception.getMessage(),"The league is already allowed");
-
-        Mockito.when(leagueRepository.countAllByAllowed(true))
-                .thenReturn(28);
-
-        exception =assertThrowsExactly(UpdateException.class,()->leagueService.allowLeague(4L));
+        exception =assertThrowsExactly(UpdateException.class,()->leagueService.allowLeague(6L));
         assertEquals(exception.getMessage(),"The limit of 28 allowed leagues is reached");
-
     }
 
     @Test
@@ -136,14 +142,13 @@ class LeagueServiceTest {
     }
 
     @Test
-    void getAllowedLeagues() {
-        ArrayList<League> leagues = leagueService.getAllowedLeagues();
-        assertEquals(leagues.size(),3);
+    void getLeagues() {
+        List<League> leagues = leagueService.getLeagues();
+        assertEquals(leagues.size(),6);
     }
 
     @Test
-    void getLeagues() {
-        List<League> leagues = leagueService.getLeagues();
-        assertEquals(leagues.size(),5);
+    void evict() {
+        leagueService.evictAllCaches();
     }
 }

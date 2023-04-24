@@ -31,8 +31,11 @@ class CallExternalAPITest {
     @Autowired
     private BetRepository betRepository;
     private LeagueService leagueService;
+    private LeagueCacheService leagueCacheService;
     private EventService eventService;
+    private EventCacheService eventCacheService;
     private BetService betService;
+    private BetCacheService betCacheService;
     private LocalDate date;
 
 
@@ -49,9 +52,12 @@ class CallExternalAPITest {
     @BeforeEach
     void setUp(){
         RestTemplate restTemplate = restTemplate(new RestTemplateBuilder());
-        leagueService = new LeagueService(leagueRepository, restTemplate);
-        eventService = new EventService(eventRepository,leagueService,restTemplate);
-        betService = new BetService(betRepository,eventService,restTemplate);
+        leagueCacheService = new LeagueCacheService(leagueRepository);
+        leagueService = new LeagueService(leagueCacheService,restTemplate);
+        eventCacheService = new EventCacheService(eventRepository);
+        eventService = new EventService(eventRepository,leagueService,eventCacheService,restTemplate);
+        betCacheService = new BetCacheService(betRepository);
+        betService = new BetService(betCacheService,eventService,restTemplate);
         date = LocalDate.now();
     }
 

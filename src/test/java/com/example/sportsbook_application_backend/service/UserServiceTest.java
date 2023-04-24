@@ -12,33 +12,41 @@ import com.example.sportsbook_application_backend.repository.UserRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.jdbc.EmbeddedDatabaseConnection;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-@ExtendWith(MockitoExtension.class)
+@RunWith(SpringRunner.class)
+@SpringBootTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.ANY, connection = EmbeddedDatabaseConnection.H2)
 class UserServiceTest {
 
-    @Mock private UserRepository userRepository;
-    @Mock private PasswordEncoder passwordEncoder;
-    @Mock private User mockedUser;//used in tests where methods of user entity need to be mocked
-    @InjectMocks private UserService userService;
+    @MockBean
+    private UserRepository userRepository;
+    @MockBean
+    private PasswordEncoder passwordEncoder;
+    @MockBean
+    private User mockedUser;//used in tests where methods of user entity need to be mocked
+    @Autowired
+    private UserService userService;
+
+    @Autowired
+    private UserCacheService userCacheService;
 
     @BeforeEach
     void setUp() {
+        userService.evictAllCache();
     }
 
     @AfterEach
@@ -191,11 +199,12 @@ class UserServiceTest {
         when(userRepository.existsUserByEmail("gosho123@abv.bg")).thenReturn(false);
         verify(userRepository,times(1)).existsUserByEmail("gosho123@abv.bg");
 
-        when(userRepository.existsUserByUsername("gosho123")).thenReturn(true);
+        userRegistrationDTO.setEmail("asd@asd.asdc");
+        when(userRepository.findUserByUsername("gosho123")).thenReturn(new User());
         DuplicateUsernameException duplicateUsernameException = assertThrows(DuplicateUsernameException.class,() -> userService.validateRegistrationFields(userRegistrationDTO));
         assertEquals("The username you entered already exists.",duplicateUsernameException.getMessage());
-        when(userRepository.existsUserByUsername("gosho123")).thenReturn(false);
-        verify(userRepository,times(1)).existsUserByUsername("gosho123");
+        userService.evictAllCache();
+        when(userRepository.findUserByUsername("gosho123")).thenReturn(null);
 
         assertDoesNotThrow(() -> userService.validateRegistrationFields(userRegistrationDTO));
     }
@@ -261,13 +270,12 @@ class UserServiceTest {
         assertEquals("The email you entered already exists.",duplicateEmailException.getMessage());
         when(userRepository.existsUserByEmail("gosho1234@abv.bg")).thenReturn(false);
         verify(userRepository,times(1)).existsUserByEmail("gosho1234@abv.bg");
-
-        when(userRepository.existsUserByUsername("gosho1234")).thenReturn(true);
+        userService.evictAllCache();
+        when(userRepository.findUserByUsername("gosho1234")).thenReturn(new User());
         DuplicateUsernameException duplicateUsernameException = assertThrows(DuplicateUsernameException.class,() -> userService.validateEditFields(user,userDTO));
         assertEquals("The username you entered already exists.",duplicateUsernameException.getMessage());
-        when(userRepository.existsUserByUsername("gosho1234")).thenReturn(false);
-        verify(userRepository,times(1)).existsUserByUsername("gosho1234");
-
+        when(userRepository.findUserByUsername("gosho1234")).thenReturn(null);
+        userService.evictAllCache();
         assertDoesNotThrow(() -> userService.validateEditFields(user,userDTO));
     }
 
@@ -284,24 +292,21 @@ class UserServiceTest {
 
     @Test
     void isUsernameExists() {
-        when(userRepository.existsUserByUsername("gosho123")).thenReturn(true);
+        when(userRepository.findUserByUsername("gosho123")).thenReturn(new User());
         assertTrue(userService.isUsernameExists("gosho123"));
-        verify(userRepository,times(1)).existsUserByUsername("gosho123");
+        userService.evictAllCache();
 
-        when(userRepository.existsUserByUsername("mariq18")).thenReturn(false);
+        when(userRepository.findUserByUsername("mariq18")).thenReturn(null);
         assertFalse(userService.isUsernameExists("mariq18"));
-        verify(userRepository,times(1)).existsUserByUsername("mariq18");
     }
 
     @Test
     void isUserExists() {
-        when(userRepository.existsById(1L)).thenReturn(true);
+        when(userRepository.findUserByUserId(1L)).thenReturn(new User());
         assertTrue(userService.isUserExists(1L));
-        verify(userRepository,times(1)).existsById(1L);
 
-        when(userRepository.existsById(2L)).thenReturn(false);
+        when(userRepository.findUserByUserId(2L)).thenReturn(null);
         assertFalse(userService.isUserExists(2L));
-        verify(userRepository,times(1)).existsById(2L);
     }
 
     @Test
@@ -318,26 +323,29 @@ class UserServiceTest {
                 .role(Role.USER)
                 .build();
 
-        when(userRepository.existsUserByUsername(user.getUsername())).thenReturn(false);
+        when(userRepository.findUserByUsername(user.getUsername())).thenReturn(null);
+        when(mockedUser.getUsername()).thenReturn(user.getUsername());
         UpdateException updateException = assertThrows(UpdateException.class,() -> userService.createUser(userRegistrationDTO));
         assertEquals("Error when creating user registration. Please try again.",updateException.getMessage());
 
-        when(userRepository.existsUserByUsername(user.getUsername())).thenReturn(true);
+        when(userRepository.findUserByUsername(user.getUsername())).thenReturn(new User());
         assertDoesNotThrow(() -> userService.createUser(userRegistrationDTO));
     }
 
     @Test
     void checkUserCredentials() {
+        User user = new User(1L,"Georgi","Ivanov","gosho123@abv.bg","Az$um_GOSHO123","gosho123",200F, UserStatus.ACTIVE, Role.USER);
         UserLoginDTO userLoginDTO = new UserLoginDTO("gosho123","Az$um_GOSHO123");
-        when(userRepository.findByUsername("gosho123")).thenReturn(Optional.empty());
+        when(userRepository.findUserByUsername("gosho123")).thenReturn(null);
         WrongCredentialsException wrongCredentialsException = assertThrows(WrongCredentialsException.class,() -> userService.checkUserCredentials(userLoginDTO));
         assertEquals("Wrong credentials!",wrongCredentialsException.getMessage());
 
-        when(userRepository.findByUsername("gosho123")).thenReturn(Optional.of(mockedUser));
+        when(userRepository.findUserByUsername("gosho123")).thenReturn(user);
         wrongCredentialsException = assertThrows(WrongCredentialsException.class,() -> userService.checkUserCredentials(userLoginDTO));
         assertEquals("Wrong credentials!",wrongCredentialsException.getMessage());
 
-        when(passwordEncoder.matches(userLoginDTO.getPassword(), mockedUser.getPassword())).thenReturn(true);
+        userService.evictAllCache();
+        when(passwordEncoder.matches(userLoginDTO.getPassword(), userLoginDTO.getPassword())).thenReturn(true);
         assertDoesNotThrow(() -> userService.checkUserCredentials(userLoginDTO));
     }
 
@@ -357,6 +365,8 @@ class UserServiceTest {
 
         UserChangePasswordDTO userChangePasswordDTO = new UserChangePasswordDTO(1L,"Az$um_GOSHO123","Az$um_GOSHO12345");
         mockedUser.setPassword(passwordEncoder.encode(userChangePasswordDTO.getNewPassword()));
+        when(mockedUser.getUsername()).thenReturn("test");
+        when(userRepository.findUserByUsername("test")).thenReturn(mockedUser);
 
         when(mockedUser.getPassword()).thenReturn("Az$um_GOSHO12345","Az$um_GOSHO123");
         UpdateException updateException = assertThrows(UpdateException.class,() -> userService.changePassword(mockedUser,userChangePasswordDTO));

@@ -5,7 +5,6 @@ import com.example.sportsbook_application_backend.exception.UpdateException;
 import com.example.sportsbook_application_backend.model.dto.league.LeaguesDTO;
 import com.example.sportsbook_application_backend.model.dto.league.LeaguesResponseDTO;
 import com.example.sportsbook_application_backend.model.entity.League;
-import com.example.sportsbook_application_backend.repository.LeagueRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -16,22 +15,20 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class LeagueService {
-
-    private final LeagueRepository leagueRepository;
+    private final LeagueCacheService leagueCacheService;
     private final RestTemplate restTemplate;
 
     public League getLeagueById(Long id){
-        return leagueRepository.getLeagueById(id);
+        return leagueCacheService.getLeagueById(id);
     }
 
-
     public void checkForExistingLeagueId(Long leagueId){
-        if(!leagueRepository.existsLeagueById(leagueId))
+        if(leagueCacheService.getLeagueById(leagueId)==null)
             throw new NonexistentDataException("League with id:"+leagueId+", does NOT exist in the database.");
     }
 
     public int callAPIForLeagues(){
-        if(leagueRepository.findAll().size()==0) {
+        if(leagueCacheService.getLeagues().size()==0) {
             int number = 0;
             String[] countries = {"World", "Bulgaria", "England", "Spain", "France", "Italia", "Germany"};
             List<String> countriesList = List.of(countries);
@@ -49,8 +46,11 @@ public class LeagueService {
                         league.setAllowed(true);
                     }
                     number++;
-                    leagueRepository.save(league);
+                    leagueCacheService.update(league);
                 }
+            }
+            if(number!=0){
+                leagueCacheService.evictLeagues();
             }
             return number;
         }
@@ -59,13 +59,14 @@ public class LeagueService {
     }
 
     public String allowLeague(Long id){
-        if(leagueRepository.countAllByAllowed(true)<28) {
+        if(getAllowedLeagues().size()<28) {
             League league = getLeagueById(id);
             if(league.isAllowed())
                 throw new UpdateException("The league is already allowed");
             else {
                 league.setAllowed(true);
-                leagueRepository.save(league);
+                leagueCacheService.update(league);
+                leagueCacheService.evictAllowedLeagues();
                 return league.getLeague();
             }
         }else {
@@ -77,7 +78,8 @@ public class LeagueService {
         League league = getLeagueById(id);
         if(league.isAllowed()){
             league.setAllowed(false);
-            leagueRepository.save(league);
+            leagueCacheService.update(league);
+            leagueCacheService.evictAllowedLeagues();
             return league.getLeague();
         }
         else
@@ -86,11 +88,17 @@ public class LeagueService {
     }
 
     public ArrayList<League> getAllowedLeagues(){
-        return leagueRepository.getAllByAllowed(true);
+        return leagueCacheService.getAllowedLeagues();
     }
 
     public List<League> getLeagues(){
-        return leagueRepository.findAll();
+        return leagueCacheService.getLeagues();
+    }
+
+    public void evictAllCaches() {
+        leagueCacheService.evictLeague();
+        leagueCacheService.evictLeagues();
+        leagueCacheService.evictAllowedLeagues();
     }
 
 }
