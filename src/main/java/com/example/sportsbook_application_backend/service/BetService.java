@@ -6,7 +6,6 @@ import com.example.sportsbook_application_backend.model.dto.odd.OddResultDTO;
 import com.example.sportsbook_application_backend.model.entity.*;
 import com.example.sportsbook_application_backend.model.enums.Outcome;
 import com.example.sportsbook_application_backend.model.enums.ResultType;
-import com.example.sportsbook_application_backend.repository.BetRepository;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,7 +22,7 @@ import java.util.*;
 public class BetService {
 
     Logger logger = LoggerFactory.getLogger(BetService.class);
-    private final BetRepository betRepository;
+    private final BetCacheService betCacheService;
     private final EventService eventService;
     private final RestTemplate restTemplate;
 
@@ -51,15 +50,15 @@ public class BetService {
                 {
                     Event event = eventService.getFixtureById(oddDTO.getFixture().getId());
 
-                    if(!betRepository.existsBetByEvent(event))
+                    if(!betCacheService.betExistByEvent(event))
                     {
                         Bet betHome = new Bet(null, event, Outcome.PENDING, ResultType.ONE, Float.parseFloat(oddDTO.getBookmakers().get(0).getBets().get(0).getValues().get(0).getOdd()));
                         Bet betDraw = new Bet(null, event, Outcome.PENDING, ResultType.ZERO, Float.parseFloat(oddDTO.getBookmakers().get(0).getBets().get(0).getValues().get(1).getOdd()));
                         Bet betAway = new Bet(null, event, Outcome.PENDING, ResultType.TWO, Float.parseFloat(oddDTO.getBookmakers().get(0).getBets().get(0).getValues().get(2).getOdd()));
 
-                        betRepository.save(betHome);
-                        betRepository.save(betDraw);
-                        betRepository.save(betAway);
+                        betCacheService.updateBet(betHome);
+                        betCacheService.updateBet(betDraw);
+                        betCacheService.updateBet(betAway);
 
                         numberOfOdds+=3;
                     }
@@ -74,7 +73,8 @@ public class BetService {
         logger.info("Method resolve bets in INVOKED.");
 
         int resolvedBets=0;
-        ArrayList<Bet> bets = betRepository.getBetByOutcomeAndEvent(Outcome.PENDING,event);
+
+        ArrayList<Bet> bets = betCacheService.betsByEventAndOutcome(Outcome.PENDING,event);
 
         for (Bet bet:bets)
         {
@@ -86,13 +86,23 @@ public class BetService {
             {
                 bet.setOutcome(Outcome.LOST);
             }
-            betRepository.save(bet);
+            betCacheService.updateBet(bet);
             resolvedBets++;
         }
+
+        betCacheService.evictBetsByEventAndOutcomeByEvent(event.getId());
         return resolvedBets;
     }
 
-    public boolean isBetExists(Long id){return betRepository.existsById(id);}
+    public boolean isBetExists(Long id){
+        return betCacheService.getBetById(id) != null;
+    }
 
-    public Bet getBetById(Long id){return betRepository.getBetById(id);}
+    public Bet getBetById(Long id){return betCacheService.getBetById(id);}
+
+    public void evictAllCaches(){
+        betCacheService.evictBet();
+        betCacheService.evictBetExistByEvent();
+        betCacheService.evictBetsByEventAndOutcome();
+    }
 }

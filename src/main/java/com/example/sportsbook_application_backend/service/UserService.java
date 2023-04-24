@@ -16,26 +16,27 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Service
 @RequiredArgsConstructor
 public class UserService {
-
+    private final UserCacheService userCacheService;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
 
-    public void updateUser(User user) {userRepository.save(user);}
+    public void updateUser(User user) {
+        userCacheService.updateUser(user);
+        userCacheService.evictUsers();
+    }
 
-    public User getUserByUsername(String username) {return userRepository.findUserByUsername(username);}
+    public User getUserByUsername(String username) {return userCacheService.getUserByUsername(username);}
 
-    public User getUserById(Long id) {return userRepository.findUserByUserId(id);}
+    public User getUserById(Long id) {return userCacheService.getUserById(id);}
 
-    public ArrayList<User> getAllUsersByStatus(UserStatus status) {return userRepository.getAllByStatus(status);}
-
+    public ArrayList<User> getAllUsersByStatus(UserStatus status) {return userCacheService.getUsers(status);}
 
     public boolean nameRegex(String firstName) {
         String regex = "^[A-Z]{1}([a-z]{2,20})$";
@@ -153,15 +154,15 @@ public class UserService {
     }
 
     public boolean isEmailExists(String email) {
-        return userRepository.existsUserByEmail(email);
+        return userCacheService.existEmail(email);
     }
 
     public boolean isUsernameExists(String username) {
-        return userRepository.existsUserByUsername(username);
+        return userCacheService.getUserByUsername(username) != null;
     }
 
     public boolean isUserExists(Long id){
-        return userRepository.existsById(id);
+        return userCacheService.getUserById(id)!=null;
     }
 
     public void createUser(UserRegistrationDTO userRegistrationDTO){
@@ -178,6 +179,7 @@ public class UserService {
                 .build();
 
         userRepository.save(user);
+        userCacheService.evictUsername(user.getUsername());
 
         //checks if user registration was successful(user was added to database)
         if(!isUsernameExists(user.getUsername()))
@@ -185,25 +187,29 @@ public class UserService {
     }
 
     public void checkUserCredentials(UserLoginDTO userLoginDTO){
-        Optional<User> user = userRepository.findByUsername(userLoginDTO.getUsername());
-        if (!(user.isPresent() && passwordEncoder.matches(userLoginDTO.getPassword(), user.get().getPassword())))
+        User user = userCacheService.getUserByUsername(userLoginDTO.getUsername());
+        if (!(user!=null && passwordEncoder.matches(userLoginDTO.getPassword(), user.getPassword())))
             throw new WrongCredentialsException("Wrong credentials!");
     }
 
     public User editUser(User user,UserDTO userDTO){
         user.setFirstName(userDTO.getFirstName());
         user.setLastName(userDTO.getLastName());
+        userCacheService.evictExistEmail(user.getEmail());
         user.setEmail(userDTO.getEmail());
+        userCacheService.evictUsername(user.getUsername());
+        userCacheService.evictUsername(userDTO.getUsername());
         user.setUsername(userDTO.getUsername());
-        userRepository.save(user);
+        userCacheService.updateUser(user);
         return user;
     }
 
     public void changePassword(User user,UserChangePasswordDTO userChangePasswordDTO){
         user.setPassword(passwordEncoder.encode(userChangePasswordDTO.getNewPassword()));
-        userRepository.save(user);
+        userCacheService.updateUser(user);
+        userCacheService.evictUsername(user.getUsername());
 
-        if(!user.getPassword().equals(getUserById(userChangePasswordDTO.getId()).getPassword()))
+        if(!userCacheService.getUserByUsername(user.getUsername()).getPassword().equals(getUserById(userChangePasswordDTO.getId()).getPassword()))
             throw new UpdateException("Unsuccessful password update. Please try again.");
     }
 
@@ -220,5 +226,12 @@ public class UserService {
 
         if(passwordEncoder.matches(userChangePasswordDTO.getNewPassword(),user.getPassword()))
             throw new DuplicatePasswordException("Please enter a password different from the old one.");
+    }
+
+    public void evictAllCache(){
+        userCacheService.evictUser();
+        userCacheService.evictUsernameAll();
+        userCacheService.evictAllExistEmail();
+        userCacheService.evictUsers();
     }
 }

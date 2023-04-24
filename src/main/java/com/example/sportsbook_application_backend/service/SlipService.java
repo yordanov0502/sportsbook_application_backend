@@ -19,8 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
+
 import java.util.ArrayList;
 
 @Service
@@ -29,6 +28,7 @@ public class SlipService {
 
     Logger logger = LoggerFactory.getLogger(SlipService.class);
     private final SlipRepository slipRepository;
+    private final SlipCacheService slipCacheService;
     private final UserService userService;
     private final BetService betService;
     private final SlipMapper slipMapper;
@@ -60,6 +60,7 @@ public class SlipService {
                        userService.updateUser(user);
                    }
            }
+           slipCacheService.updateHistory(user);
            //if a user has no slips with status PENDING and has 0$ balance, then his account becomes FROZEN and no longer can place bets(slips)
             if(slipRepository.getAllByUserAndOutcome(user,Outcome.PENDING).isEmpty() && user.getBalance()==0)
             {
@@ -104,7 +105,7 @@ public class SlipService {
         if(!userService.isUserExists(id))
             throw new NonexistentDataException("User with id:"+id+" does NOT exist in the database.");
 
-        ArrayList<Slip> expiredSlips = slipRepository.getExpiredBetsOfUser(userService.getUserById(id));
+        ArrayList<Slip> expiredSlips = slipCacheService.getHistory(userService.getUserById(id));
         if(expiredSlips.isEmpty())
             throw new NonexistentDataException("User with id:"+id+" does NOT have any expired bets yet.");
 
@@ -115,6 +116,10 @@ public class SlipService {
         }
 
         return slipDTOS;
+    }
+
+    public void evictHistory(){
+        slipCacheService.evictHistory();
     }
 
 }

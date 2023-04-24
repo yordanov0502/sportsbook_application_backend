@@ -33,6 +33,7 @@ class EventServiceTest {
 
     @BeforeEach
     public void setUp() {
+        eventService.evictAllCaches();
         League league = new League(1L, "Premier league", "England", "League", 2022, true);
         Event event = new Event(1L,league, LocalDateTime.now(), LocalDate.now(),"Chelsea","Arsenal","Not Started",null);
         Event event2 = new Event(2L,league, LocalDateTime.now(), LocalDate.now(),"Manchester United","Everton","Not Started",null);
@@ -152,5 +153,10 @@ class EventServiceTest {
         numberOfSimMatches = eventService.simulateFixturesByDate(LocalDate.now().plusDays(2).toString());
         assertThat(numberOfSimMatches)
                 .isEqualTo(0);
+    }
+
+    @Test
+    void evict() {
+        eventService.evictAllCaches();
     }
 }

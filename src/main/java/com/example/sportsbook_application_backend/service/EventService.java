@@ -7,10 +7,7 @@ import com.example.sportsbook_application_backend.model.entity.League;
 import com.example.sportsbook_application_backend.model.enums.ResultType;
 import com.example.sportsbook_application_backend.repository.EventRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDate;
@@ -24,6 +21,7 @@ public class EventService {
 
     private final EventRepository eventRepository;
     private final LeagueService leagueService;
+    private final EventCacheService eventCacheService;
     private final RestTemplate restTemplate;
 
 
@@ -48,10 +46,12 @@ public class EventService {
                 else
                     event.setResult(null);
 
-                eventRepository.save(event);
+                eventCacheService.updateEvent(event);
                 numberOfFixtures++;
             }
         }
+        if(numberOfFixtures!=0)
+            eventCacheService.updateEvents(parsedDate);
         return numberOfFixtures;
     }
 
@@ -59,12 +59,14 @@ public class EventService {
     public ArrayList<Event> getAllFixturesByDate(String date) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         LocalDate parsedDate = LocalDate.parse(date, formatter);
-        return eventRepository.getAllByDate(parsedDate);
+        return eventCacheService.getAllEventsByDate(parsedDate);
     }
 
-    public Event getFixtureById(Long id){return eventRepository.getById(id);}
+    public Event getFixtureById(Long id){return eventCacheService.getEventById(id);}
 
-    public boolean fixtureExists(Long id){return eventRepository.existsEventById(id);}
+    public boolean fixtureExists(Long id){
+        return eventCacheService.getEventById(id) != null;
+    }
 
     public int simulateFixturesByDate(String date){
         int numberOfFixtures=0;
@@ -77,24 +79,31 @@ public class EventService {
             switch (sim()) {
                 case 0 -> {
                     event.setResult(ResultType.ZERO);
-                    eventRepository.save(event);
+                    eventCacheService.updateEvent(event);
                 }
                 case 1 -> {
                     event.setResult(ResultType.ONE);
-                    eventRepository.save(event);
+                    eventCacheService.updateEvent(event);
                 }
                 case 2 -> {
                     event.setResult(ResultType.TWO);
-                    eventRepository.save(event);
+                    eventCacheService.updateEvent(event);
                 }
             }
             numberOfFixtures++;
         }
+        if(numberOfFixtures!=0)
+            eventCacheService.updateEvents(localDate);
         return numberOfFixtures;
     }
 
     public int sim(){
         return (int)(Math.random()*3);
+    }
+
+    public void evictAllCaches() {
+        eventCacheService.evictEvent();
+        eventCacheService.evictEvents();
     }
 
 }

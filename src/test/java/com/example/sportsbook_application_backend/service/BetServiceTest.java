@@ -9,12 +9,13 @@ import com.example.sportsbook_application_backend.repository.BetRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.jdbc.EmbeddedDatabaseConnection;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.junit4.SpringRunner;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -25,15 +26,19 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.times;
 
-@ExtendWith(MockitoExtension.class)
+@RunWith(SpringRunner.class)
+@SpringBootTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.ANY, connection = EmbeddedDatabaseConnection.H2)
 class BetServiceTest {
 
-    @Mock private BetRepository betRepository;
-    @InjectMocks private BetService betService;
+    @MockBean
+    private BetRepository betRepository;
+    @Autowired
+    private BetService betService;
 
     @BeforeEach
     void setUp() {
+        betService.evictAllCaches();
     }
 
     @AfterEach
@@ -64,13 +69,11 @@ class BetServiceTest {
 
     @Test
     void isBetExists() {
-        when(betRepository.existsById(1L)).thenReturn(true);
+        when(betRepository.getBetById(1L)).thenReturn(new Bet());
         assertTrue(betService.isBetExists(1L));
-        verify(betRepository,times(1)).existsById(1L);
 
-        when(betRepository.existsById(2L)).thenReturn(false);
+        when(betRepository.getBetById(1L)).thenReturn(null);
         assertFalse(betService.isBetExists(2L));
-        verify(betRepository,times(1)).existsById(2L);
     }
 
     @Test
